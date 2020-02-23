@@ -39,10 +39,26 @@ dependencies {
 
 
     implementation 'com.squareup.picasso:picasso:2.71828'
+    implementation 'de.hdodenhof:circleimageview:3.1.0'
+    implementation 'com.airbnb.android:lottie:3.3.1'
+    implementation 'com.github.andrefrsousa:SuperBottomSheet:1.5.0'
+    implementation 'com.github.florent37:arclayout:1.0.3'
 
     //Firebase
     implementation 'com.google.firebase:firebase-analytics:17.2.2'
     implementation 'com.google.firebase:firebase-config:19.1.1'
+    implementation 'com.google.firebase:firebase-auth:19.2.0'
+
+    //Gson
+    implementation "com.google.code.gson:gson:2.8.5"
+
+    //Retrofit
+    implementation "com.squareup.retrofit2:retrofit:2.4.0"
+    implementation "com.squareup.retrofit2:converter-gson:2.4.0"
+    implementation 'com.jakewharton.retrofit:retrofit2-kotlin-coroutines-adapter:0.9.2'
+
+
+
 
 
 
