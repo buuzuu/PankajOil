@@ -127,11 +127,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 if (response.code() == 200) {
                     val products: List<Product> = response.body()!!
                     Util.stopLoading(lottie)
-                    Toast.makeText(
-                        this@MainActivity,
-                        "Success ${products[16].productName}",
-                        Toast.LENGTH_SHORT
-                    ).show()
+//                    Toast.makeText(
+//                        this@MainActivity,
+//                        "Success ${products[16].productName}",
+//                        Toast.LENGTH_SHORT
+//                    ).show()
                 }
 
             }

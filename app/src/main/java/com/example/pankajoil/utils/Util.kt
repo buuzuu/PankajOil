@@ -7,8 +7,12 @@ import com.airbnb.lottie.LottieAnimationView
 import com.example.pankajoil.PasswordResetBottomSheet
 import com.example.pankajoil.RegisterBottomSheet
 import com.example.pankajoil.TokenSharedPreference
+import com.example.pankajoil.service.RetrofitService
+import okhttp3.Cache
+import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import java.util.concurrent.TimeUnit
 
 
 class Util {
@@ -21,7 +25,15 @@ class Util {
 
         val generalRetrofit = Retrofit.Builder()
             .addConverterFactory(GsonConverterFactory.create())
-            .baseUrl("https://pankaj-oil-api.herokuapp.com/").build()!!
+            .client(okHttpClient())
+            .baseUrl("https://pankaj-oil-api.herokuapp.com/")
+            .build()!!
+
+        private fun okHttpClient(): OkHttpClient {
+            return  OkHttpClient.Builder()
+                .connectTimeout(8,TimeUnit.SECONDS)
+                .build()
+        }
 
         fun setupLoggedInOrOutView(
             header_user: TextView,
@@ -72,8 +84,6 @@ class Util {
             view.cancelAnimation()
             view.visibility = View.GONE
         }
-
-
 
     }
 }
