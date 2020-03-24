@@ -8,7 +8,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.Toast
-import com.airbnb.lottie.LottieAnimationView
 import com.example.pankajoil.data.LoginCredentials
 import com.example.pankajoil.service.APIServices
 import com.example.pankajoil.utils.Util
@@ -35,7 +34,7 @@ class PasswordResetBottomSheet : BottomSheetDialogFragment() {
     private lateinit var getOTP_btn: Button
     private lateinit var otp_edtText: TextInputLayout
     private lateinit var mobileNumber: TextInputLayout
-    private lateinit var reset_lottie:LottieAnimationView
+    private lateinit var reset_dialog: android.app.AlertDialog
     private lateinit var newPassword: TextInputLayout
     private lateinit var repeatPassword: TextInputLayout
     private lateinit var mAuth: FirebaseAuth
@@ -51,7 +50,6 @@ class PasswordResetBottomSheet : BottomSheetDialogFragment() {
         otp_edtText = view2.findViewById(R.id.otp_Layout)
         mobileNumber = view2.findViewById(R.id.mobileNumber)
         newPassword = view2.findViewById(R.id.newPassword_Layout)
-        reset_lottie = view2.findViewById(R.id.reset_view)
         repeatPassword = view2.findViewById(R.id.repeatPassword_Layout)
         getOTP_btn = view2.findViewById(R.id.getOTP_btn)
         mAuth = FirebaseAuth.getInstance()
@@ -86,7 +84,7 @@ class PasswordResetBottomSheet : BottomSheetDialogFragment() {
                     otp_edtText.editText!!.text =
                         Editable.Factory.getInstance().newEditable(smsCode)
                     verifyCode(smsCode)
-                    Util.stopLoading(reset_lottie)
+                    Util.stopLoading(reset_dialog)
                 }
             }
 
@@ -122,7 +120,7 @@ class PasswordResetBottomSheet : BottomSheetDialogFragment() {
             ) {
                 super.onCodeSent(verificationId, token)
                 Log.d("TAG", "onCodeSent:$verificationId")
-                Util.startLoading(reset_lottie)
+                Util.startLoading(reset_dialog)
                 storedVerificationId = verificationId
                 resendToken = token
 

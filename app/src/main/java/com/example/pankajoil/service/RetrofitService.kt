@@ -27,6 +27,7 @@ class RetrofitService{
             val myCache = Cache(ctx.cacheDir, Util.cacheSize)
             return  OkHttpClient.Builder()
                 .cache(myCache)
+                .connectTimeout(15,TimeUnit.SECONDS)
                 .addInterceptor(httpLoggingInterceptor())
                 .addNetworkInterceptor(networkInterceptor())
                 .addInterceptor(offLineInterceptor(ctx))
@@ -40,7 +41,7 @@ class RetrofitService{
 
         private fun networkInterceptor():Interceptor{
             return Interceptor { chain ->
-                Log.d("TAG", "network interceptor: called.");
+                Log.d("TAG", "network interceptor: called.")
                 val response :Response = chain.proceed(chain.request())
                 val cacheControl:CacheControl = CacheControl.Builder().maxAge(1,TimeUnit.DAYS).build()
 
@@ -54,7 +55,7 @@ class RetrofitService{
 
         private fun offLineInterceptor(ctx:Context):Interceptor{
             return Interceptor { chain ->
-                Log.d("TAG", "offline interceptor: called.");
+                Log.d("TAG", "offline interceptor: called.")
                 var request:Request = chain.request()
 
                 if (!hasNetwork(ctx)!!){

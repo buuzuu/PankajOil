@@ -4,4 +4,7 @@
     <color name="colorPrimaryDark">#CF0125</color>
     <color name="colorAccent">#992007</color>
 <!--    <color name="colorAccent">#992007</color>-->
+
+    <color name="heart_primary_color">#da4439</color>
+    <color name="heart_secondary_color">#8a098c</color>
 </resources>

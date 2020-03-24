@@ -1,14 +1,16 @@
 package com.example.pankajoil
 
-
+import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.view.inputmethod.InputMethodManager
 import android.widget.*
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AlertDialog
@@ -18,7 +20,6 @@ import androidx.appcompat.widget.Toolbar
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
-import com.airbnb.lottie.LottieAnimationView
 import com.example.jetpack_kotlin.ui.home.*
 import com.example.pankajoil.data.LoginCredentials
 import com.example.pankajoil.data.Product
@@ -30,7 +31,14 @@ import com.google.android.material.navigation.NavigationView
 import com.google.android.material.textfield.TextInputLayout
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings
+import com.karumi.dexter.Dexter
+import com.karumi.dexter.MultiplePermissionsReport
+import com.karumi.dexter.PermissionToken
+import com.karumi.dexter.listener.PermissionRequest
+import com.karumi.dexter.listener.multi.MultiplePermissionsListener
 import com.squareup.picasso.Picasso
+import de.hdodenhof.circleimageview.CircleImageView
+import dmax.dialog.SpotsDialog
 import org.json.JSONObject
 import retrofit2.Call
 import retrofit2.Callback
@@ -43,22 +51,16 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private lateinit var toolbar: Toolbar
     private lateinit var drawerLayout: DrawerLayout
     private lateinit var navView: NavigationView
-    private lateinit var searchView: SearchView
     private lateinit var banner: ImageView
-    lateinit var fragment: Fragment
-    private lateinit var edtText: EditText
+    private var fragment: Fragment = HomeFragment()
     private lateinit var toolbar_title: TextView
     private lateinit var remoteConfig: FirebaseRemoteConfig
     private lateinit var headerView: View
-    private lateinit var signin_text: TextView
-    private lateinit var orsymbol_text: TextView
+
     private lateinit var signin: Button
-    private lateinit var register: TextView
     private lateinit var forgot_text: TextView
-    private lateinit var header_name: TextView
-    private lateinit var header_mobile: TextView
-    private lateinit var lottie: LottieAnimationView
-    private lateinit var signin_lottie: LottieAnimationView
+
+    private lateinit var dialog: android.app.AlertDialog
     private lateinit var alert: AlertDialog
     private lateinit var login_number: TextInputLayout
     private lateinit var login_password: TextInputLayout
@@ -71,40 +73,51 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayShowTitleEnabled(false)
         toolbar_title = toolbar.findViewById(R.id.toolbar_title)
-        toolbar_title.text = "Pankaj Oil Indistries"
+        toolbar_title.text = "Pankaj Oil Industries"
         toolbar_title.textAlignment = View.TEXT_ALIGNMENT_CENTER
         drawerLayout = findViewById(R.id.drawer_layout)
         navView = findViewById(R.id.nav_view)
         headerView = navView.getHeaderView(0)
         banner = findViewById(R.id.image_id)
-        searchView = findViewById(R.id.searchView)
-        lottie = findViewById(R.id.animation_view)
-        Util.startLoading(lottie)
-        signin_text = headerView.findViewById(R.id.signin) as TextView
-        register = headerView.findViewById(R.id.register) as TextView
-        header_name = headerView.findViewById(R.id.header_name) as TextView
-        header_mobile = headerView.findViewById(R.id.header_mobile) as TextView
-        orsymbol_text = headerView.findViewById(R.id.orsymbol_tv) as TextView
+        dialog = SpotsDialog.Builder().setContext(this).setTheme(R.style.Custom).setMessage("Loading...").setCancelable(false).build()
+
+        Util.signin_text = headerView.findViewById(R.id.signin) as TextView
+        Util.register = headerView.findViewById(R.id.register) as TextView
+        Util.header_name = headerView.findViewById(R.id.header_name) as TextView
+        Util.header_mobile = headerView.findViewById(R.id.header_mobile) as TextView
+        Util.orsymbol_text = headerView.findViewById(R.id.orsymbol_tv) as TextView
+        Util.profilePicture = headerView.findViewById(R.id.profilePicture) as CircleImageView
+
+        Dexter.withActivity(this).withPermissions(
+            Manifest.permission.WRITE_EXTERNAL_STORAGE,
+            Manifest.permission.READ_EXTERNAL_STORAGE
+        )
+            .withListener(object : MultiplePermissionsListener {
+                override fun onPermissionsChecked(report: MultiplePermissionsReport?) {
+                }
+                override fun onPermissionRationaleShouldBeShown(
+                    permissions: MutableList<PermissionRequest>?,
+                    token: PermissionToken?
+                ) {
+                }
+            }).check()
+
 
         Util.setupLoggedInOrOutView(
-            header_name,
-            header_mobile,
-            signin_text,
-            register,
-            orsymbol_text,
+            Util.header_name!!,
+            Util.header_mobile!!,
+            Util.signin_text!!,
+            Util.register!!,
+            Util.orsymbol_text!!,
             this
         )
         if (TokenSharedPreference(this).isTokenPresent()) {
+            Util.startLoading(dialog)
             loadUserDetails(
                 TokenSharedPreference(this).getMobileNumber(),
                 TokenSharedPreference(this).getAuthKey()
             )
         }
-
-        edtText = searchView.findViewById(androidx.appcompat.R.id.search_src_text)
-        edtText.setTextColor(Color.BLACK)
-        edtText.setHintTextColor(Color.parseColor("#909090"))
-
         val toggle = ActionBarDrawerToggle(this, drawerLayout, toolbar, 0, 0)
         drawerLayout.addDrawerListener(toggle)
         toggle.syncState()
@@ -112,32 +125,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         supportFragmentManager.beginTransaction().add(R.id.host_fragment, HomeFragment()).commit()
 
         setRemoteConfig()
-        //Retrofit..........
 
-        val service: APIServices =
-            RetrofitService.retrofitService(this).create(APIServices::class.java)
-        val call = service.getProducts()
-        call.enqueue(object : Callback<List<Product>> {
-            override fun onFailure(call: Call<List<Product>>, t: Throwable) {
-                Log.d("TAG", t.message.toString())
-            }
-
-            override fun onResponse(data: Call<List<Product>>, response: Response<List<Product>>) {
-
-                if (response.code() == 200) {
-                    val products: List<Product> = response.body()!!
-                    Util.stopLoading(lottie)
-//                    Toast.makeText(
-//                        this@MainActivity,
-//                        "Success ${products[16].productName}",
-//                        Toast.LENGTH_SHORT
-//                    ).show()
-                }
-
-            }
-        })
-
-        signin_text.setOnClickListener {
+        Util.signin_text!!.setOnClickListener {
             if (drawerLayout.isDrawerOpen(GravityCompat.START)) drawerLayout.closeDrawer(
                 GravityCompat.START
             )
@@ -145,28 +134,32 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             val view: View = layoutInflater.inflate(R.layout.signin_layout, null)
             signin = view.findViewById(R.id.signin_btn)
             forgot_text = view.findViewById(R.id.forgot_text)
-            signin_lottie = view.findViewById(R.id.signin_view)
             login_number = view.findViewById(R.id.mobileNumber_Layout)
             login_password = view.findViewById(R.id.password_Layout)
             dialogBuilder.setView(view)
             dialogBuilder.setCancelable(true)
             alert = dialogBuilder.create()
             alert.show()
-            forgot_text.setOnClickListener{
+            forgot_text.setOnClickListener {
                 alert.dismiss()
-                Util.passwordSheet.show(supportFragmentManager , "PasswordResetBottomSheet")
+                Util.passwordSheet.show(supportFragmentManager, "PasswordResetBottomSheet")
             }
             signin.setOnClickListener {
-                Util.startLoading(signin_lottie)
+                val view = this.currentFocus
+                view?.let { v ->
+                    val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
+                    imm?.hideSoftInputFromWindow(v.windowToken, 0)
+                }
+                Util.startLoading(dialog)
 
                 getJWTToken(
-                    signin_lottie, alert,
+                     alert,
                     login_number.editText!!.text.toString(),
                     login_password.editText!!.text.toString(), this
                 )
             }
         }
-        register.setOnClickListener {
+        Util.register!!.setOnClickListener {
             if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
                 drawerLayout.closeDrawer(GravityCompat.START)
             }
@@ -175,8 +168,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     }
 
-    private fun loadUserDetails(mobileNumber: String, authKey: String) {
 
+
+    private fun loadUserDetails(mobileNumber: String, authKey: String) {
         val service: APIServices = Util.generalRetrofit.create(APIServices::class.java)
         val call = service.getUserDetails(
             mobileNumber,
@@ -184,19 +178,31 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         )
         call.enqueue(object : Callback<User> {
             override fun onFailure(call: Call<User>, t: Throwable) {
-                Toast.makeText(this@MainActivity, t.message, Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@MainActivity, t.message+"- Restart the app", Toast.LENGTH_LONG).show()
+                Util.stopLoading(dialog)
             }
 
             override fun onResponse(call: Call<User>, response: Response<User>) {
                 when (response.code()) {
                     200 -> {
-                        val user: User? = response.body()
-                        Toast.makeText(this@MainActivity, user!!.companyName, Toast.LENGTH_LONG)
+                        Util.user = response.body()
+                        Log.d("TAG", Util.user!!.profileImage)
+                        Picasso.get().load(Util.user!!.profileImage).into(Util.profilePicture!!)
+                        Toast.makeText(
+                            this@MainActivity,
+                            Util.user!!.companyName,
+                            Toast.LENGTH_LONG
+                        )
                             .show()
+                        Util.stopLoading(dialog)
+
+
                     }
                     400 -> {
                         Toast.makeText(this@MainActivity, "Number Unregistered", Toast.LENGTH_SHORT)
                             .show()
+                        Util.stopLoading(dialog)
+
                     }
                 }
 
@@ -208,7 +214,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 
     private fun getJWTToken(
-        view: LottieAnimationView,
+
         alert: AlertDialog,
         id: String,
         pass: String,
@@ -219,7 +225,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         val call = service.signIn(credentials)
         call.enqueue(object : Callback<JSONObject> {
             override fun onFailure(call: Call<JSONObject>, t: Throwable) {
-                Util.stopLoading(view)
+                Util.stopLoading(dialog)
                 Toast.makeText(this@MainActivity, "Failed", Toast.LENGTH_SHORT).show()
             }
 
@@ -231,18 +237,18 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                             id
                         )
                         Util.setupLoggedInOrOutView(
-                            header_name,
-                            header_mobile,
-                            signin_text,
-                            register,
-                            orsymbol_text,
+                            Util.header_name!!,
+                            Util.header_mobile!!,
+                            Util.signin_text!!,
+                            Util.register!!,
+                            Util.orsymbol_text!!,
                             ctx
                         )
                         loadUserDetails(
                             TokenSharedPreference(ctx).getMobileNumber(),
                             TokenSharedPreference(ctx).getAuthKey()
                         )
-                        Util.stopLoading(view)
+
                         alert.dismiss()
                     }
 
@@ -252,7 +258,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                             "Wrong Password or Mobile Number",
                             Toast.LENGTH_SHORT
                         ).show()
-                        Util.stopLoading(view)
+                        Util.stopLoading(dialog)
                     }
                     else -> {
                         Toast.makeText(
@@ -261,7 +267,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                             Toast.LENGTH_SHORT
                         )
                             .show()
-                        Util.stopLoading(view)
+                        Util.stopLoading(dialog)
 
                     }
                 }
@@ -270,6 +276,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 
     override fun onStart() {
+
         super.onStart()
         remoteConfig.fetchAndActivate().addOnCompleteListener(this) { task ->
             if (task.isSuccessful) {
@@ -317,18 +324,12 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
-            R.id.action_search -> {
-                Toast.makeText(
-                    this, "Clicked",
-                    Toast.LENGTH_LONG
-                ).show()
+            R.id.action_cart -> {
+
                 true
             }
-            R.id.action_notification -> {
-                Toast.makeText(
-                    this, "Clicked",
-                    Toast.LENGTH_LONG
-                ).show()
+            R.id.action_search -> {
+                startActivity(Intent(this,SearchActivity::class.java ))
                 true
             }
             else -> super.onOptionsItemSelected(item)
@@ -338,45 +339,39 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.nav_home -> {
-
-                Toast.makeText(this, "Profile clicked", Toast.LENGTH_SHORT).show()
                 fragment = HomeFragment()
             }
             R.id.nav_profile -> {
-                Toast.makeText(this, "Messages clicked", Toast.LENGTH_SHORT).show()
-                fragment = ProfileFragment()
 
+                if (TokenSharedPreference(this).isTokenPresent()) {
+                    fragment = ProfileFragment()
+                } else {
+                    Toast.makeText(this, "Sign in your account ", Toast.LENGTH_SHORT).show()
+                }
             }
             R.id.nav_cart -> {
-                Toast.makeText(this, "Messages clicked", Toast.LENGTH_SHORT).show()
                 fragment = CartFragment()
 
             }
             R.id.nav_orders -> {
-                Toast.makeText(this, "Messages clicked", Toast.LENGTH_SHORT).show()
                 fragment = OrderFragment()
 
             }
             R.id.nav_wishList -> {
-                Toast.makeText(this, "Messages clicked", Toast.LENGTH_SHORT).show()
                 fragment = WishlistFragment()
 
             }
             R.id.nav_notification -> {
-                Toast.makeText(this, "Messages clicked", Toast.LENGTH_SHORT).show()
                 fragment = NotificationFragment()
 
             }
             R.id.nav_feedback -> {
                 fragment = NotificationFragment()
-                searchView.visibility = View.VISIBLE
-                Toast.makeText(this, "Sign out clicked", Toast.LENGTH_SHORT).show()
+
             }
             R.id.nav_rate -> {
                 fragment = NotificationFragment()
-                searchView.visibility = View.GONE
                 logout()
-                Toast.makeText(this, "Sign out clicked", Toast.LENGTH_SHORT).show()
             }
         }
         supportFragmentManager.beginTransaction()
@@ -395,7 +390,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             .setMinimumFetchIntervalInSeconds(0)
             .build()
         remoteConfig.setConfigSettingsAsync(configSettings)
-        val hashMap: HashMap<String, Any> = HashMap<String, Any>(3)
+        val hashMap: HashMap<String, Any> = HashMap(3)
         hashMap.put(
             "image_link",
             "https://www.daimler.com/bilder/produkte/pkw/mercedes-benz/cla/neuer-cla/18c0973-028-w768xh1536-cutout.jpg"
@@ -405,14 +400,19 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         remoteConfig.setDefaultsAsync(hashMap)
 
-
     }
 
-     fun logout (){
-        Util.signOut(header_name, header_mobile, signin_text, register, orsymbol_text, this)
+    private fun logout() {
+        Util.signOut(
+            Util.header_name!!,
+            Util.header_mobile!!,
+            Util.signin_text!!,
+            Util.register!!,
+            Util.orsymbol_text!!,
+            this
+        )
 
     }
-
 
 
 }

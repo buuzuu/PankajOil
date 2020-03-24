@@ -8,6 +8,7 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
+
     <style name="AppTheme.NoActionBar">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
@@ -19,6 +20,13 @@
 
     <style name="MyDialogTheme" parent="Theme.AppCompat.Light.Dialog.Alert">
         <item name="android:windowBackground">@android:color/transparent</item>
+    </style>
+
+    <style name="Custom" parent="android:Theme.Material.Light.Dialog.Alert">
+        <item name="DialogTitleAppearance">@android:style/TextAppearance.Medium</item>
+        <item name="background">@android:color/white</item>
+        <item name="DialogSpotColor">@color/colorPrimary</item>
+        <item name="DialogSpotCount">5</item>
     </style>
 
 </resources>
