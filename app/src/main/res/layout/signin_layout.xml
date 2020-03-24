@@ -121,14 +121,7 @@
 
     </LinearLayout>
 
-    <com.airbnb.lottie.LottieAnimationView
-        android:id="@+id/signin_view"
-        android:layout_width="200dp"
-        android:layout_height="200dp"
-        android:visibility="gone"
-        app:lottie_loop="true"
-        android:layout_centerInParent="true"
-        app:lottie_rawRes="@raw/dots" />
+
 
 
 </RelativeLayout>

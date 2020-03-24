@@ -2,6 +2,8 @@ package com.example.pankajoil.data
 
 
 import com.google.gson.annotations.SerializedName
+import java.io.Serializable
+
 
 data class Product(
     @SerializedName("_id")
@@ -13,4 +15,4 @@ data class Product(
     val generalUrl: String,
     @SerializedName("__v")
     val v: Int
-)
+):Serializable

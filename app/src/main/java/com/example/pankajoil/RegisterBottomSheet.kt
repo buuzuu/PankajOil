@@ -8,8 +8,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.Toast
-import com.airbnb.lottie.LottieAnimationView
-import com.example.pankajoil.data.LoginCredentials
 import com.example.pankajoil.data.SignupUser
 import com.example.pankajoil.service.APIServices
 import com.example.pankajoil.utils.Util
@@ -41,7 +39,8 @@ class RegisterBottomSheet : BottomSheetDialogFragment() {
     private lateinit var address: TextInputLayout
     private lateinit var otp: TextInputLayout
     private lateinit var getOTP_btn: Button
-    private lateinit var register_view: LottieAnimationView
+    private lateinit var register_dialog: android.app.AlertDialog
+
     private lateinit var callbacks: PhoneAuthProvider.OnVerificationStateChangedCallbacks
     private var storedVerificationId: String = ""
     private lateinit var mAuth: FirebaseAuth
@@ -69,10 +68,10 @@ class RegisterBottomSheet : BottomSheetDialogFragment() {
             ) {
                 Toast.makeText(activity, "Please fill all the details", Toast.LENGTH_SHORT).show()
             } else {
-                Util.startLoading(register_view)
+                Util.startLoading(register_dialog)
                 verify("+91" + mobileNumber.editText!!.text.toString())
                 Util.registerSheet.isCancelable = false
-                Util.startLoading(register_view)
+                Util.startLoading(register_dialog)
 
             }
         }
@@ -91,7 +90,6 @@ class RegisterBottomSheet : BottomSheetDialogFragment() {
         address = view.findViewById(R.id.address)
         otp = view.findViewById(R.id.otp)
         getOTP_btn = view.findViewById(R.id.getOTP_btn)
-        register_view = view.findViewById(R.id.register_view)
     }
 
     fun setupCallback() {
@@ -103,7 +101,7 @@ class RegisterBottomSheet : BottomSheetDialogFragment() {
                     otp.editText!!.text =
                         Editable.Factory.getInstance().newEditable(smsCode)
                     verifyCode(smsCode)
-                    Util.stopLoading(register_view)
+                    Util.stopLoading(register_dialog)
                     Util.registerSheet.dismiss()
                 }
             }
@@ -181,6 +179,7 @@ class RegisterBottomSheet : BottomSheetDialogFragment() {
                                 200 -> {
 
                                     Util.registerSheet.dismiss()
+                                    Toast.makeText(activity, "Account Created", Toast.LENGTH_LONG).show()
 
                                 }
                                 400 -> {

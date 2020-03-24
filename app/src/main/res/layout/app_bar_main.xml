@@ -31,17 +31,18 @@
 
         </androidx.appcompat.widget.Toolbar>
 
-        <androidx.appcompat.widget.SearchView
-            android:id="@+id/searchView"
-            android:layout_width="match_parent"
-            android:layout_height="35dp"
-            android:layout_gravity="center_horizontal"
-            android:layout_margin="10dp"
-            android:background="#fff"
-            app:closeIcon="@drawable/ic_send_black_24dp"
-            android:textAlignment="center"
-            app:defaultQueryHint="Search"
-            app:searchIcon="@drawable/ic_search_black_24dp" />
+<!--        <androidx.appcompat.widget.SearchView-->
+<!--            android:id="@+id/searchView"-->
+<!--            android:visibility="gone"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="35dp"-->
+<!--            android:layout_gravity="center_horizontal"-->
+<!--            android:layout_margin="10dp"-->
+<!--            android:background="#fff"-->
+<!--            app:closeIcon="@drawable/ic_send_black_24dp"-->
+<!--            android:textAlignment="center"-->
+<!--            app:defaultQueryHint="Search"-->
+<!--            app:searchIcon="@drawable/ic_search_black_24dp" />-->
 
 
     </com.google.android.material.appbar.AppBarLayout>
