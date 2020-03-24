@@ -33,9 +33,16 @@ interface APIServices {
     @POST("users")
     fun createUser(@Body user: SignupUser): Call<ResponseBody>
 
+    @PUT("users/addToWishlist/{id}")
+    fun addToWishList(@Body wishlistProducts: WishlistProducts,@Path("id") id: String, @Header("x-Auth-Token") authKey: String):Call<ResponseBody>
+
+
     @Multipart
     @POST("uploadProfileImage/{id}")
     fun uploadProfileImage(@Path("id") id: String, @Part file: MultipartBody.Part, @Header("x-Auth-Token") authKey: String): Call<ProfileImage>
+
+
+
 
 
 }
