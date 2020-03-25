@@ -36,6 +36,9 @@ interface APIServices {
     @PUT("users/addToWishlist/{id}")
     fun addToWishList(@Body wishlistProducts: WishlistProducts,@Path("id") id: String, @Header("x-Auth-Token") authKey: String):Call<ResponseBody>
 
+    @DELETE("users/deleteWishListProduct/{id}/{uniqueID}")
+    fun deleteFromWishList(@Path("id") id: String,@Header("x-Auth-Token") authKey: String,@Path("uniqueID") u_id: String):Call<ResponseBody>
+
 
     @Multipart
     @POST("uploadProfileImage/{id}")

@@ -190,7 +190,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         Picasso.get().load(Util.user!!.profileImage).into(Util.profilePicture!!)
                         Toast.makeText(
                             this@MainActivity,
-                            Util.user!!.companyName,
+                            Util.user!!.wishlistProducts.size.toString(),
                             Toast.LENGTH_LONG
                         )
                             .show()

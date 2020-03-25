@@ -1,12 +1,11 @@
 package com.example.pankajoil.utils
 
-import android.app.AlertDialog
 import android.content.Context
 import android.view.View
 import android.widget.TextView
-import com.example.pankajoil.PasswordResetBottomSheet
+import com.example.pankajoil.bottomSheets.PasswordResetBottomSheet
 import com.example.pankajoil.R
-import com.example.pankajoil.RegisterBottomSheet
+import com.example.pankajoil.bottomSheets.RegisterBottomSheet
 import com.example.pankajoil.TokenSharedPreference
 import com.example.pankajoil.data.Product
 import com.example.pankajoil.data.User
@@ -32,8 +31,10 @@ class Util {
         var products: List<Product>? = null
         var variant:Variant?=null
         const val cacheSize = (5 * 1024 * 1024).toLong()
-        val passwordSheet = PasswordResetBottomSheet()
-        val registerSheet = RegisterBottomSheet()
+        val passwordSheet =
+            PasswordResetBottomSheet()
+        val registerSheet =
+            RegisterBottomSheet()
 
         val generalRetrofit = Retrofit.Builder()
             .addConverterFactory(GsonConverterFactory.create())

@@ -1,4 +1,4 @@
-package com.example.pankajoil
+package com.example.pankajoil.bottomSheets
 
 import android.os.Bundle
 import android.text.Editable
@@ -8,7 +8,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.Toast
-import com.example.pankajoil.data.SignupUser
+import com.example.pankajoil.R
+import com.example.pankajoil.data.LoginCredentials
 import com.example.pankajoil.service.APIServices
 import com.example.pankajoil.utils.Util
 import com.google.android.gms.tasks.TaskExecutors
@@ -26,87 +27,73 @@ import retrofit2.Callback
 import retrofit2.Response
 import java.util.concurrent.TimeUnit
 
-class RegisterBottomSheet : BottomSheetDialogFragment() {
+class PasswordResetBottomSheet : BottomSheetDialogFragment() {
 
-    private lateinit var view3: View
-    private lateinit var firstName: TextInputLayout
-    private lateinit var lastName: TextInputLayout
-    private lateinit var companyName: TextInputLayout
-    private lateinit var mobileNumber: TextInputLayout
-    private lateinit var email: TextInputLayout
-    private lateinit var password: TextInputLayout
-    private lateinit var gstin: TextInputLayout
-    private lateinit var address: TextInputLayout
-    private lateinit var otp: TextInputLayout
-    private lateinit var getOTP_btn: Button
-    private lateinit var register_dialog: android.app.AlertDialog
-
-    private lateinit var callbacks: PhoneAuthProvider.OnVerificationStateChangedCallbacks
     private var storedVerificationId: String = ""
+    private lateinit var resendToken: PhoneAuthProvider.ForceResendingToken
+    private lateinit var callbacks: PhoneAuthProvider.OnVerificationStateChangedCallbacks
+    private lateinit var getOTP_btn: Button
+    private lateinit var otp_edtText: TextInputLayout
+    private lateinit var mobileNumber: TextInputLayout
+    private lateinit var reset_dialog: android.app.AlertDialog
+    private lateinit var newPassword: TextInputLayout
+    private lateinit var repeatPassword: TextInputLayout
     private lateinit var mAuth: FirebaseAuth
-
-
+    private lateinit var view2: View
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-
         super.onCreateView(inflater, container, savedInstanceState)
-        view3 = inflater.inflate(R.layout.register_sheet, container, false)
-        setupID(view3)
         setupCallback()
+        view2 = inflater.inflate(R.layout.password_sheet, container, false)
+        otp_edtText = view2.findViewById(R.id.otp_Layout)
+        mobileNumber = view2.findViewById(R.id.mobileNumber)
+        newPassword = view2.findViewById(R.id.newPassword_Layout)
+        repeatPassword = view2.findViewById(R.id.repeatPassword_Layout)
+        getOTP_btn = view2.findViewById(R.id.getOTP_btn)
         mAuth = FirebaseAuth.getInstance()
 
         getOTP_btn.setOnClickListener {
-            if (firstName.editText!!.text.isNullOrBlank() ||
-                companyName.editText!!.text.isNullOrBlank() ||
-                mobileNumber.editText!!.text.isNullOrBlank() ||
-                password.editText!!.text.isNullOrBlank() ||
-                gstin.editText!!.text.isNullOrBlank() ||
-                address.editText!!.text.isNullOrBlank()
-            ) {
-                Toast.makeText(activity, "Please fill all the details", Toast.LENGTH_SHORT).show()
-            } else {
-                Util.startLoading(register_dialog)
-                verify("+91" + mobileNumber.editText!!.text.toString())
-                Util.registerSheet.isCancelable = false
-                Util.startLoading(register_dialog)
 
+            if (newPassword.editText!!.text.toString() == repeatPassword.editText!!.text.toString()) {
+                Util.passwordSheet.isCancelable = false
+                verify("+91" + mobileNumber.editText!!.text.toString())
+            } else {
+                Toast.makeText(activity, "Password do not match", Toast.LENGTH_SHORT).show()
             }
+
         }
 
-        return view3
+        return view2
     }
 
-    private fun setupID(view: View) {
-        firstName = view.findViewById(R.id.firstName)
-        lastName = view.findViewById(R.id.lastName)
-        companyName = view.findViewById(R.id.companyName)
-        mobileNumber = view.findViewById(R.id.mobileNumber)
-        email = view.findViewById(R.id.email)
-        password = view.findViewById(R.id.password)
-        gstin = view.findViewById(R.id.gstin)
-        address = view.findViewById(R.id.address)
-        otp = view.findViewById(R.id.otp)
-        getOTP_btn = view.findViewById(R.id.getOTP_btn)
+    private fun verify(number: String) {
+
+        PhoneAuthProvider.getInstance()
+            .verifyPhoneNumber(number, 60, TimeUnit.SECONDS, TaskExecutors.MAIN_THREAD, callbacks)
     }
 
     fun setupCallback() {
         callbacks = object : PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
 
             override fun onVerificationCompleted(credential: PhoneAuthCredential) {
+                Log.d("TAG", "onVerificationCompleted:$credential")
                 val smsCode: String? = credential.smsCode
                 if (!smsCode.isNullOrEmpty()) {
-                    otp.editText!!.text =
+                    otp_edtText.editText!!.text =
                         Editable.Factory.getInstance().newEditable(smsCode)
                     verifyCode(smsCode)
-                    Util.stopLoading(register_dialog)
-                    Util.registerSheet.dismiss()
+                    Util.stopLoading(reset_dialog)
                 }
             }
 
             override fun onVerificationFailed(e: FirebaseException) {
+
+
+                Log.w("TAG", "onVerificationFailed", e)
+
                 if (e is FirebaseAuthInvalidCredentialsException) {
 
                     Toast.makeText(
@@ -123,6 +110,8 @@ class RegisterBottomSheet : BottomSheetDialogFragment() {
                         Toast.LENGTH_SHORT
                     ).show()
                 }
+                Util.passwordSheet.isCancelable = true
+
 
             }
 
@@ -132,17 +121,13 @@ class RegisterBottomSheet : BottomSheetDialogFragment() {
             ) {
                 super.onCodeSent(verificationId, token)
                 Log.d("TAG", "onCodeSent:$verificationId")
+                Util.startLoading(reset_dialog)
                 storedVerificationId = verificationId
+                resendToken = token
 
             }
         }
 
-    }
-
-    private fun verify(number: String) {
-
-        PhoneAuthProvider.getInstance()
-            .verifyPhoneNumber(number, 60, TimeUnit.SECONDS, TaskExecutors.MAIN_THREAD, callbacks)
     }
 
     fun verifyCode(code: String) {
@@ -153,39 +138,34 @@ class RegisterBottomSheet : BottomSheetDialogFragment() {
                 if (task.isSuccessful) {
                     //Code Verified
                     // Make network request
-                    val service: APIServices = Util.generalRetrofit.create(APIServices::class.java)
-                    val signup_user = SignupUser(
-                        firstName.editText!!.text.toString(),
-                        lastName.editText!!.text.toString(),
-                        companyName.editText!!.text.toString(),
+                    val service: APIServices =
+                        Util.generalRetrofit.create((APIServices::class.java))
+                    val cred = LoginCredentials(
                         mobileNumber.editText!!.text.toString(),
-                        email.editText!!.text.toString(),
-                        password.editText!!.text.toString(),
-                        address.editText!!.text.toString(),
-                        gstin.editText!!.text.toString()
+                        newPassword.editText!!.text.toString()
+
                     )
-                    val call = service.createUser(signup_user)
+                    val call = service.changePassword(cred)
                     call.enqueue(object : Callback<ResponseBody> {
                         override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
                             Toast.makeText(activity, "Something went wrong", Toast.LENGTH_SHORT)
                                 .show()
                         }
-
                         override fun onResponse(
                             call: Call<ResponseBody>,
                             response: Response<ResponseBody>
                         ) {
                             when (response.code()) {
                                 200 -> {
-
-                                    Util.registerSheet.dismiss()
-                                    Toast.makeText(activity, "Account Created", Toast.LENGTH_LONG).show()
+                                    Toast.makeText(activity, "Changed Success", Toast.LENGTH_SHORT)
+                                        .show()
+                                    Util.passwordSheet.dismiss()
 
                                 }
                                 400 -> {
                                     Toast.makeText(
                                         activity,
-                                        "Number Already Registered",
+                                        "Number Not Registered",
                                         Toast.LENGTH_SHORT
                                     ).show()
 
@@ -203,3 +183,6 @@ class RegisterBottomSheet : BottomSheetDialogFragment() {
 
 
 }
+
+
+

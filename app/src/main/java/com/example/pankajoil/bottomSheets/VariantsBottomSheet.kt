@@ -1,4 +1,4 @@
-package com.example.pankajoil
+package com.example.pankajoil.bottomSheets
 
 import android.os.Bundle
 import android.util.Log
@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.pankajoil.R
 import com.example.pankajoil.`interface`.OnVariantDataSent
 import com.example.pankajoil.adapter.OnVariantClickListner
 import com.example.pankajoil.adapter.VariantRecyclerAdapter
