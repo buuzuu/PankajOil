@@ -25,7 +25,6 @@ class Cart : AppCompatActivity() {
 
     var item: OrderItem? = null
     private lateinit var toolbar: Toolbar
-
     lateinit var database: OrderDatabase
     lateinit var dao: OrderDAO
     lateinit var list:List<OrderEntity>

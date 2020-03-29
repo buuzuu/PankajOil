@@ -180,8 +180,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             override fun onFailure(call: Call<User>, t: Throwable) {
                 Toast.makeText(this@MainActivity, t.message+"- Restart the app", Toast.LENGTH_LONG).show()
                 Util.stopLoading(dialog)
+                logout()
             }
-
             override fun onResponse(call: Call<User>, response: Response<User>) {
                 when (response.code()) {
                     200 -> {
@@ -404,7 +404,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     }
 
-    private fun logout() {
+     fun logout() {
         Util.signOut(
             Util.header_name!!,
             Util.header_mobile!!,
