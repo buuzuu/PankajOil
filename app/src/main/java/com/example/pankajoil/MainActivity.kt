@@ -325,6 +325,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.action_cart -> {
+                startActivity(Intent(this, Cart::class.java))
 
                 true
             }
@@ -350,7 +351,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 }
             }
             R.id.nav_cart -> {
-                fragment = CartFragment()
+              //  fragment = CartFragment()
+                startActivity(Intent(this, Cart::class.java))
 
             }
             R.id.nav_orders -> {

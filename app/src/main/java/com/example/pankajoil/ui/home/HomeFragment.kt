@@ -81,7 +81,8 @@ class HomeFragment : Fragment() {
         call.enqueue(object : Callback<List<Product>>, OnGridItemClickListner,
             OnHorizontalGridItemClickListner, OnSliderItemClickListner {
             override fun onFailure(call: Call<List<Product>>, t: Throwable) {
-                Toast.makeText(activity!!.applicationContext,"Display Something", Toast.LENGTH_LONG).show()
+                Toast.makeText(activity!!.applicationContext,"Display Something ON Timeout", Toast.LENGTH_LONG).show()
+                dialog.dismiss()
             }
 
             override fun onResponse(data: Call<List<Product>>, response: Response<List<Product>>) {

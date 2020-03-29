@@ -2,7 +2,6 @@ package com.example.pankajoil
 
 import android.content.Intent
 import android.os.Bundle
-import android.os.Handler
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
@@ -10,54 +9,65 @@ import android.widget.ImageView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
-import com.example.pankajoil.`interface`.OnVariantDataSent
 import com.example.pankajoil.bottomSheets.VariantsBottomSheet
-import com.example.pankajoil.data.Product
-import com.example.pankajoil.data.User
-import com.example.pankajoil.data.Variant
-import com.example.pankajoil.data.WishlistProducts
+import com.example.pankajoil.data.*
+import com.example.pankajoil.roomDatabase.OrderDAO
+import com.example.pankajoil.roomDatabase.OrderDatabase
+import com.example.pankajoil.roomDatabase.OrderEntity
 import com.example.pankajoil.service.APIServices
 import com.example.pankajoil.utils.Util
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
 import com.squareup.picasso.Picasso
 import com.varunest.sparkbutton.SparkEventListener
 import kotlinx.android.synthetic.main.activity_product_page.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.io.Serializable
 import java.util.*
 
-class ProductPage() : AppCompatActivity(), OnVariantDataSent {
+class ProductPage : AppCompatActivity() {
 
-    private lateinit var toolbar: Toolbar
-    private lateinit var bottomSheet: VariantsBottomSheet
+    lateinit var toolbar: Toolbar
+    lateinit var addToCart: FloatingActionButton
     var product: Product? = null
+    lateinit var database: OrderDatabase
+    lateinit var dao: OrderDAO
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_product_page)
         toolbar = findViewById(R.id.toolbar)
+        setupID()
+        database = OrderDatabase.getInstance(this)
+        dao = database.movieDao()
         setSupportActionBar(toolbar)
+        addToCart = findViewById(R.id.addToCart)
         supportActionBar?.setDisplayShowTitleEnabled(false)
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
         supportActionBar!!.setDisplayShowHomeEnabled(true)
         product = intent.getSerializableExtra("product") as Product
-        bottomSheet = VariantsBottomSheet(
-            product!!,
-            this
-        )
+        Util.prod_BottomSheet = VariantsBottomSheet(product!!)
+        Util.current_Variant = product!!.variants[0]
 
-        Picasso.get().load(product!!.variants[0].url).into(image)
-        size.text = "${product!!.variants[0].size} ℓ"
-        quantity.text = "${product!!.variants[0].perCarton} piece"
-        item_name.text = product!!.productName
-        item_price.text = "₹ ${product!!.variants[0].price}"
-        about.text = product!!.description
+        Picasso.get().load(Util.current_Variant!!.url).into(Util.prod_Image)
+        Util.prod_Size!!.text = "${Util.current_Variant!!.size} ℓ"
+        Util.prod_Quantity!!.text = "${Util.current_Variant!!.perCarton} piece"
+        Util.prod_Item_Name!!.text = product!!.productName
+        Util.prod_Item_Price!!.text = "₹ ${Util.current_Variant!!.price}"
+        Util.prod_About!!.text = product!!.description
+
+
+
         if (TokenSharedPreference(this@ProductPage).isTokenPresent()) {
             setSparkButton(Util.user!!, product!!.uniqueID)
         }
         volume.setOnClickListener {
-            bottomSheet.show(supportFragmentManager, "VariantBottomSheet")
+            Util.prod_BottomSheet!!.show(supportFragmentManager, "VariantBottomSheet")
         }
         //Setting wishlist
         val service: APIServices = Util.generalRetrofit.create(APIServices::class.java)
@@ -72,10 +82,10 @@ class ProductPage() : AppCompatActivity(), OnVariantDataSent {
             TokenSharedPreference(this).getAuthKey(),
             product!!.uniqueID
         )
-
         spark_button.setEventListener(object : SparkEventListener {
             override fun onEventAnimationEnd(button: ImageView?, buttonState: Boolean) {
             }
+
             override fun onEvent(button: ImageView?, buttonState: Boolean) {
                 if (buttonState) {
                     if (TokenSharedPreference(this@ProductPage).isTokenPresent()) {
@@ -84,6 +94,7 @@ class ProductPage() : AppCompatActivity(), OnVariantDataSent {
                                 Toast.makeText(this@ProductPage, t.message, Toast.LENGTH_LONG)
                                     .show()
                             }
+
                             override fun onResponse(
                                 call: Call<ResponseBody>,
                                 response: Response<ResponseBody>
@@ -189,6 +200,32 @@ class ProductPage() : AppCompatActivity(), OnVariantDataSent {
 
         })
 
+        addToCart.setOnClickListener {
+            CoroutineScope(Dispatchers.IO).launch {
+                dao.addOrder(
+                    OrderEntity(
+                        product!!.uniqueID,
+                        product!!.productName,
+                        Util.current_Variant!!.size,
+                        1,
+                        Util.current_Variant!!.url,
+                        Util.current_Variant!!.price,
+                        Util.current_Variant!!.perCarton
+                    )
+                )
+                startActivity(Intent(this@ProductPage, Cart::class.java))
+            }
+        }
+
+    }
+
+    fun setupID() {
+        Util.prod_Image = findViewById(R.id.image)
+        Util.prod_About = findViewById(R.id.about)
+        Util.prod_Item_Price = findViewById(R.id.item_price)
+        Util.prod_Item_Name = findViewById(R.id.item_name)
+        Util.prod_Size = findViewById(R.id.size)
+        Util.prod_Quantity = findViewById(R.id.quantity)
     }
 
     override fun onResume() {
@@ -208,6 +245,7 @@ class ProductPage() : AppCompatActivity(), OnVariantDataSent {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.action_cart -> {
+                startActivity(Intent(this, Cart::class.java))
 
                 true
             }
@@ -223,24 +261,8 @@ class ProductPage() : AppCompatActivity(), OnVariantDataSent {
         }
     }
 
-    fun updateUI(variant: Variant?) {
-        Picasso.get().load(variant!!.url).into(image)
-        size.text = "${variant.size} ℓ"
-        quantity.text = "${variant.perCarton} piece"
-        item_price.text = "₹ ${variant.price}"
 
-        Handler().postDelayed({
-            bottomSheet.dismiss()
-        }, 500)
-
-    }
-
-    override fun onRecieveVariant(variant: Variant) {
-        Log.d("TAG", variant!!.price.toString() + "From Product page")
-        updateUI(variant)
-    }
-
-    fun setSparkButton(user: User, id: String) {
+    private fun setSparkButton(user: User, id: String) {
         var check = false
         val products = user.wishlistProducts
         for (p in products) {

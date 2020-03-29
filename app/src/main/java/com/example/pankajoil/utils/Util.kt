@@ -2,14 +2,18 @@ package com.example.pankajoil.utils
 
 import android.content.Context
 import android.view.View
+import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.TextView
 import com.example.pankajoil.bottomSheets.PasswordResetBottomSheet
 import com.example.pankajoil.R
 import com.example.pankajoil.bottomSheets.RegisterBottomSheet
 import com.example.pankajoil.TokenSharedPreference
+import com.example.pankajoil.bottomSheets.VariantsBottomSheet
 import com.example.pankajoil.data.Product
 import com.example.pankajoil.data.User
 import com.example.pankajoil.data.Variant
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import de.hdodenhof.circleimageview.CircleImageView
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
@@ -20,6 +24,27 @@ import java.util.concurrent.TimeUnit
 class Util {
 
     companion object {
+
+        //Product Page variables
+        var current_Variant:Variant?=null
+
+        var prod_Image:ImageView?= null
+        var prod_Size:TextView?= null
+        var prod_Quantity:TextView?= null
+        var prod_Item_Name:TextView?= null
+        var prod_Item_Price:TextView?= null
+        var prod_About:TextView?= null
+        var prod_BottomSheet:VariantsBottomSheet?= null
+
+        //Cart
+        var cartItem: TextView?=null
+        var qty: TextView?=null
+        var empty_Image: ImageView?=null
+        lateinit var cart_Bottom:FloatingActionButton
+
+
+
+
 
         var signin_text: TextView? = null
         var orsymbol_text: TextView? = null

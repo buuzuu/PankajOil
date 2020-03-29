@@ -16,7 +16,9 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
-        <activity android:name=".ProductPage"></activity>
+        <activity android:name=".Cart" />
+        <activity android:name=".ProductPage" />
+        <activity android:name=".OrderSummary" />
         <activity
             android:name=".SearchActivity"
             android:label="@string/title_activity_search"

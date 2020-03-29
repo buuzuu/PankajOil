@@ -30,7 +30,7 @@
             android:id="@+id/uploadImage"
             android:layout_gravity="bottom|center"
             android:layout_height="30dp"
-            android:src="@drawable/editicon"/>
+            android:src="@drawable/edit_icon"/>
     </FrameLayout>
 
 

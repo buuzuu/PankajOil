@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout android:layout_width="match_parent"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_height="wrap_content">
+
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
+        app:cardElevation="6dp"
+        app:cardCornerRadius="5dp"
+        android:layout_margin="10dp"
+        android:layout_height="wrap_content"
+        >
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <LinearLayout
+                android:id="@+id/top_linear"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:id="@+id/linear"
+                    android:layout_width="match_parent"
+                    android:weightSum="5"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="3"
+                        android:orientation="vertical"
+                        android:padding="8dp">
+
+                        <TextView
+                            android:id="@+id/name"
+                            android:layout_width="fill_parent"
+                            android:maxLines="1"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="10dp"
+                            android:text="Minda Gold Gear Oil "
+                            android:textColor="@android:color/black"
+                            android:textSize="22sp" />
+
+                        <TextView
+                            android:id="@+id/volume"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="5dp"
+                            android:text="20 liters"
+                            android:textStyle="italic"
+                            android:textSize="20sp" />
+
+                        <TextView
+                            android:id="@+id/pieces"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="40dp"
+                            android:text="6 per carton"
+                            android:textSize="14sp" />
+
+                        <TextView
+                            android:id="@+id/price"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="10dp"
+                            android:text="₹ 12,470"
+                            android:textColor="@android:color/black"
+                            android:textSize="25sp"
+                            android:textStyle="bold" />
+
+
+                    </LinearLayout>
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:id="@+id/quantity"
+                        android:layout_weight="2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:padding="8dp">
+
+                        <ImageView
+                            android:id="@+id/image"
+                            android:layout_width="120dp"
+                            android:layout_height="120dp"
+                            app:layout_constraintLeft_toLeftOf="parent"
+                            app:layout_constraintRight_toRightOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="5dp"
+                            android:background="@drawable/price_border"
+                            android:orientation="horizontal"
+                            android:padding="4dp"
+                            app:layout_constraintLeft_toLeftOf="parent"
+                            app:layout_constraintRight_toRightOf="parent"
+                            app:layout_constraintTop_toBottomOf="@id/image">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="match_parent"
+                                android:text="Qty: "
+                                android:textColor="@android:color/black"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:id="@+id/qty"
+                                android:layout_width="wrap_content"
+                                android:layout_height="match_parent"
+                                android:layout_marginRight="2dp"
+                                android:text="40"
+                                android:textColor="@android:color/black"
+                                android:textStyle="bold" />
+
+                            <ImageView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:src="@drawable/ic_arrow_drop_down_black_24dp" />
+
+                        </LinearLayout>
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="0.2dp"
+                    android:layout_gravity="bottom"
+                    android:layout_marginBottom="4dp"
+                    android:background="@android:color/black" />
+
+
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/remove"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/top_linear"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp"
+                android:background="@drawable/selected_variant"
+                android:drawableStart="@drawable/ic_delete_black_24dp"
+                android:padding="3dp"
+                android:text="Remove"
+                android:textAlignment="center"
+                android:textColor="@color/colorPrimary" />
+
+<!--            <View-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="0.2dp"-->
+<!--                android:layout_below="@+id/remove"-->
+<!--                android:layout_gravity="bottom"-->
+<!--                android:layout_marginBottom="2dp"-->
+<!--                android:background="@android:color/black" />-->
+
+        </RelativeLayout>
+
+
+    </androidx.cardview.widget.CardView>
+
+</RelativeLayout>

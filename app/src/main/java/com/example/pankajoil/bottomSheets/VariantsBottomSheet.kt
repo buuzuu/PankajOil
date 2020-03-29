@@ -1,28 +1,27 @@
 package com.example.pankajoil.bottomSheets
 
 import android.os.Bundle
-import android.util.Log
+import android.os.Handler
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.pankajoil.R
-import com.example.pankajoil.`interface`.OnVariantDataSent
 import com.example.pankajoil.adapter.OnVariantClickListner
 import com.example.pankajoil.adapter.VariantRecyclerAdapter
 import com.example.pankajoil.data.Product
 import com.example.pankajoil.data.Variant
+import com.example.pankajoil.utils.Util
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.variant_sheet.view.*
 
-class VariantsBottomSheet(product: Product, clickListner: OnVariantDataSent) :
+class VariantsBottomSheet(product: Product) :
     BottomSheetDialogFragment(), OnVariantClickListner {
     var prod: Product? = null
     var list:List<Variant>? =null
-    var listner:OnVariantDataSent?=null
     init {
         prod = product
-        listner=clickListner
         list = prod!!.variants
     }
 
@@ -45,10 +44,24 @@ class VariantsBottomSheet(product: Product, clickListner: OnVariantDataSent) :
     }
 
     override fun onVariantClick(variant: Variant?) {
-        Log.d("TAG",variant!!.price.toString() + "From Bottomsheet")
         if (variant != null) {
-            listner!!.onRecieveVariant(variant)
+            updateUI(variant)
+
         }
+    }
+
+    private fun updateUI(variant: Variant?) {
+        Picasso.get().load(variant!!.url).into(Util.prod_Image)
+        Util.prod_Size!!.text = "${variant.size} ℓ"
+        Util.prod_Quantity!!.text = "${variant.perCarton} piece"
+        Util.prod_Item_Price!!.text = "₹ ${variant.price}"
+
+        Util.current_Variant = variant
+
+        Handler().postDelayed({
+            Util.prod_BottomSheet!!.dismiss()
+        }, 500)
+
     }
 
 }

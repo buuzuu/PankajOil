@@ -240,7 +240,8 @@
         android:layout_centerInParent="true"
         android:layout_marginBottom="24dp"
         android:id="@+id/addToCart"
-        android:src="@drawable/ic_add_shopping_cart_black_24dp"
+        app:rippleColor="@color/colorAccent"
+        android:src="@drawable/ic_add_shopping_cart_white_24dp"
         app:backgroundTint="@color/colorPrimary" />
 
 
