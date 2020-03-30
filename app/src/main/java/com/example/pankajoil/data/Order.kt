@@ -4,12 +4,11 @@ package com.example.pankajoil.data
 import com.google.gson.annotations.SerializedName
 
 data class Order(
-    val items: List<Item>,
-    @SerializedName("_id")
-    val id: String,
-    val orderID: String,
-    val totalAmount: Int,
-    val companyName: String,
-    val address: String,
-    val paymentMode: String
+    var items: List<Item>,
+
+    var orderID: String,
+    var totalAmount: Int,
+    var companyName: String,
+    var address: String,
+    var paymentMode: String
 )

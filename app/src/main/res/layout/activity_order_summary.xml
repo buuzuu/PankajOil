@@ -258,7 +258,7 @@
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:weightSum="4"
-                                android:layout_marginBottom="3dp"
+                                android:layout_marginBottom="8dp"
                                 android:orientation="horizontal">
 
                                 <TextView
@@ -280,6 +280,11 @@
                                     android:id="@+id/cst"
                                     android:textSize="14sp" />
                             </LinearLayout>
+                            <View
+                                android:layout_width="match_parent"
+                                android:layout_marginBottom="3dp"
+                                android:background="@android:color/darker_gray"
+                                android:layout_height="0.5dp"/>
                             <LinearLayout
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
@@ -306,18 +311,64 @@
                                     android:id="@+id/payableAmount"
                                     android:textSize="14sp" />
                             </LinearLayout>
+                            <View
+                                android:layout_width="match_parent"
+                                android:background="@android:color/darker_gray"
+                                android:layout_height="0.5dp"/>
 
-
-
-
-
-
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:paddingStart="4dp"
+                                android:textColor="@color/colorPrimaryDark"
+                                android:fontFamily="@font/andika"
+                                android:textSize="14sp"
+                                android:textStyle="bold"
+                                android:layout_marginTop="8dp"
+                                android:layout_height="wrap_content"
+                                android:text="Payment"/>
 
 
                         </LinearLayout>
 
-
                     </androidx.cardview.widget.CardView>
+
+                    <RadioGroup
+                        android:layout_width="match_parent"
+                        android:layout_marginTop="8dp"
+                        android:layout_height="wrap_content"
+                        android:weightSum="4"
+                        android:layout_margin="5dp"
+                        android:orientation="horizontal">
+                        <RadioButton android:id="@+id/now"
+                            android:layout_width="match_parent"
+                            android:background="@drawable/price_border"
+                            android:layout_weight="2"
+                            android:layout_marginRight="2dp"
+                            android:layout_height="wrap_content"
+                            android:text="Pay now"
+                            android:onClick="onRadioButtonClicked"/>
+                        <RadioButton android:id="@+id/later"
+                            android:layout_width="match_parent"
+                            android:background="@drawable/price_border"
+                            android:layout_weight="2"
+                            android:layout_marginLeft="2dp"
+                            android:layout_height="wrap_content"
+                            android:text="Pay Later"
+                            android:onClick="onRadioButtonClicked"/>
+                    </RadioGroup>
+                    <Button
+                        android:id="@+id/placeOrder"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/shape_logout"
+                        android:text="Place Order"
+                        android:textColor="@android:color/white"
+                        android:textStyle="bold"
+                        android:textSize="20sp"
+                        android:layout_alignParentBottom="true"
+
+                        />
+
 
                 </LinearLayout>
             </ScrollView>
@@ -326,7 +377,10 @@
         </androidx.cardview.widget.CardView>
 
 
+
     </LinearLayout>
+
+
 
 
 </RelativeLayout>

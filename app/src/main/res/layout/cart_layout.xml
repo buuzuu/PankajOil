@@ -1,16 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout android:layout_width="match_parent"
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
-        app:cardElevation="6dp"
-        app:cardCornerRadius="5dp"
-        android:layout_margin="10dp"
         android:layout_height="wrap_content"
-        >
+        android:layout_margin="10dp"
+        app:cardCornerRadius="5dp"
+        app:cardElevation="6dp">
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -25,9 +24,9 @@
                 <LinearLayout
                     android:id="@+id/linear"
                     android:layout_width="match_parent"
-                    android:weightSum="5"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal">
+                    android:orientation="horizontal"
+                    android:weightSum="5">
 
                     <LinearLayout
                         android:layout_width="wrap_content"
@@ -39,9 +38,9 @@
                         <TextView
                             android:id="@+id/name"
                             android:layout_width="fill_parent"
-                            android:maxLines="1"
                             android:layout_height="wrap_content"
                             android:layout_marginBottom="10dp"
+                            android:maxLines="1"
                             android:text="Minda Gold Gear Oil "
                             android:textColor="@android:color/black"
                             android:textSize="22sp" />
@@ -52,8 +51,8 @@
                             android:layout_height="wrap_content"
                             android:layout_marginBottom="5dp"
                             android:text="20 liters"
-                            android:textStyle="italic"
-                            android:textSize="20sp" />
+                            android:textSize="20sp"
+                            android:textStyle="italic" />
 
                         <TextView
                             android:id="@+id/pieces"
@@ -78,9 +77,9 @@
 
                     <androidx.constraintlayout.widget.ConstraintLayout
                         android:id="@+id/quantity"
-                        android:layout_weight="2"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_weight="2"
                         android:padding="8dp">
 
                         <ImageView
@@ -114,6 +113,8 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="match_parent"
                                 android:layout_marginRight="2dp"
+                                android:paddingLeft="0.5dp"
+                                android:paddingRight="0.5dp"
                                 android:text="40"
                                 android:textColor="@android:color/black"
                                 android:textStyle="bold" />
@@ -154,13 +155,13 @@
                 android:textAlignment="center"
                 android:textColor="@color/colorPrimary" />
 
-<!--            <View-->
-<!--                android:layout_width="match_parent"-->
-<!--                android:layout_height="0.2dp"-->
-<!--                android:layout_below="@+id/remove"-->
-<!--                android:layout_gravity="bottom"-->
-<!--                android:layout_marginBottom="2dp"-->
-<!--                android:background="@android:color/black" />-->
+            <!--            <View-->
+            <!--                android:layout_width="match_parent"-->
+            <!--                android:layout_height="0.2dp"-->
+            <!--                android:layout_below="@+id/remove"-->
+            <!--                android:layout_gravity="bottom"-->
+            <!--                android:layout_marginBottom="2dp"-->
+            <!--                android:background="@android:color/black" />-->
 
         </RelativeLayout>
 
