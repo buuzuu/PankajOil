@@ -15,6 +15,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "413792905928-lonu83btskahsdbih4u8uq93sjo5adb4.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.pankajoil",
+            "certificate_hash": "cc1087922113b8afb46cdf8ea5d20a41e3743ba8"
+          }
+        },
+        {
           "client_id": "413792905928-n9svjm55dr59k257skp9b8p3jffnvf5u.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {

@@ -21,6 +21,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import com.google.firebase.auth.PhoneAuthCredential
 import com.google.firebase.auth.PhoneAuthProvider
+import dmax.dialog.SpotsDialog
 import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.Callback
@@ -54,14 +55,16 @@ class PasswordResetBottomSheet : BottomSheetDialogFragment() {
         repeatPassword = view2.findViewById(R.id.repeatPassword_Layout)
         getOTP_btn = view2.findViewById(R.id.getOTP_btn)
         mAuth = FirebaseAuth.getInstance()
+        reset_dialog = SpotsDialog.Builder().setContext(view2.context).setTheme(R.style.Custom).setMessage("Please wait ...").setCancelable(false).build()
 
         getOTP_btn.setOnClickListener {
 
             if (newPassword.editText!!.text.toString() == repeatPassword.editText!!.text.toString()) {
                 Util.passwordSheet.isCancelable = false
                 verify("+91" + mobileNumber.editText!!.text.toString())
+                Util.startLoading(reset_dialog)
             } else {
-                Toast.makeText(activity, "Password do not match", Toast.LENGTH_SHORT).show()
+                Toast.makeText(view2.context, "Password do not match", Toast.LENGTH_LONG).show()
             }
 
         }
@@ -79,36 +82,38 @@ class PasswordResetBottomSheet : BottomSheetDialogFragment() {
         callbacks = object : PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
 
             override fun onVerificationCompleted(credential: PhoneAuthCredential) {
-                Log.d("TAG", "onVerificationCompleted:$credential")
                 val smsCode: String? = credential.smsCode
                 if (!smsCode.isNullOrEmpty()) {
                     otp_edtText.editText!!.text =
                         Editable.Factory.getInstance().newEditable(smsCode)
                     verifyCode(smsCode)
                     Util.stopLoading(reset_dialog)
+                }else{
+                    sendToDataBase(credential)
+                    Util.stopLoading(reset_dialog)
+                    Util.passwordSheet.dismiss()
+
                 }
             }
 
             override fun onVerificationFailed(e: FirebaseException) {
-
-
-                Log.w("TAG", "onVerificationFailed", e)
-
                 if (e is FirebaseAuthInvalidCredentialsException) {
 
                     Toast.makeText(
-                        activity!!.applicationContext,
+                        view2.context,
                         "Invalid PhoneNumber",
-                        Toast.LENGTH_SHORT
+                        Toast.LENGTH_LONG
                     ).show()
+                    Util.stopLoading(reset_dialog)
                     // [END_EXCLUDE]
                 } else if (e is FirebaseTooManyRequestsException) {
                     // The SMS quota for the project has been exceeded
                     Toast.makeText(
-                        activity!!.applicationContext,
+                        view2.context,
                         "Quota Exceeded",
                         Toast.LENGTH_SHORT
                     ).show()
+                    Util.startLoading(reset_dialog)
                 }
                 Util.passwordSheet.isCancelable = true
 
@@ -121,10 +126,14 @@ class PasswordResetBottomSheet : BottomSheetDialogFragment() {
             ) {
                 super.onCodeSent(verificationId, token)
                 Log.d("TAG", "onCodeSent:$verificationId")
-                Util.startLoading(reset_dialog)
                 storedVerificationId = verificationId
                 resendToken = token
 
+            }
+
+            override fun onCodeAutoRetrievalTimeOut(p0: String) {
+                super.onCodeAutoRetrievalTimeOut(p0)
+                Toast.makeText(view2.context,"Timeout: Retry",Toast.LENGTH_SHORT).show()
             }
         }
 
@@ -133,8 +142,13 @@ class PasswordResetBottomSheet : BottomSheetDialogFragment() {
     fun verifyCode(code: String) {
         val credentials: PhoneAuthCredential =
             PhoneAuthProvider.getCredential(storedVerificationId, code)
+        sendToDataBase(credentials)
+
+    }
+
+    fun sendToDataBase(credential: PhoneAuthCredential){
         activity?.let {
-            mAuth.signInWithCredential(credentials).addOnCompleteListener(it) { task ->
+            mAuth.signInWithCredential(credential).addOnCompleteListener(it) { task ->
                 if (task.isSuccessful) {
                     //Code Verified
                     // Make network request
@@ -148,7 +162,7 @@ class PasswordResetBottomSheet : BottomSheetDialogFragment() {
                     val call = service.changePassword(cred)
                     call.enqueue(object : Callback<ResponseBody> {
                         override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
-                            Toast.makeText(activity, "Something went wrong", Toast.LENGTH_SHORT)
+                            Toast.makeText(view2.context, "Something went wrong", Toast.LENGTH_LONG)
                                 .show()
                         }
                         override fun onResponse(
@@ -157,17 +171,18 @@ class PasswordResetBottomSheet : BottomSheetDialogFragment() {
                         ) {
                             when (response.code()) {
                                 200 -> {
-                                    Toast.makeText(activity, "Changed Success", Toast.LENGTH_SHORT)
+                                    Toast.makeText(view2.context, "Changed Success", Toast.LENGTH_LONG)
                                         .show()
                                     Util.passwordSheet.dismiss()
 
                                 }
                                 400 -> {
                                     Toast.makeText(
-                                        activity,
+                                        view2.context,
                                         "Number Not Registered",
-                                        Toast.LENGTH_SHORT
+                                        Toast.LENGTH_LONG
                                     ).show()
+                                    Util.stopLoading(reset_dialog)
 
                                 }
                             }

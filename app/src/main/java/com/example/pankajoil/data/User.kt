@@ -16,7 +16,7 @@ data class User(
     val address: String,
     val gstin: String,
     var wishlistProducts: List<WishlistProducts>,
-    val orders: List<Order>,
+    var orders: List<Order>,
     @SerializedName("__v")
     val v: Int
 )

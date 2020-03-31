@@ -1,0 +1,251 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_marginBottom="15dp"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
+        app:cardElevation="8dp"
+        app:cardCornerRadius="5dp"
+        android:padding="3dp"
+        android:layout_margin="5dp"
+        android:layout_marginBottom="10dp"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:weightSum="4"
+                android:layout_marginBottom="8dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_marginRight="4dp"
+                    android:layout_weight="2"
+                    android:paddingRight="2dp"
+                    android:textColor="@android:color/black"
+                    android:background="#C3E5EA"
+                    android:fontFamily="@font/andika"
+                    android:textAlignment="textStart"
+                    android:layout_height="wrap_content"
+                    android:text="Order ID"
+                    android:paddingLeft="2dp"
+                    android:textStyle="bold"
+                    android:id="@+id/orderID"
+                    android:textSize="14sp" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:background="#C3E5EA"
+                    android:layout_weight="2"
+                    android:textColor="@android:color/black"
+                    android:fontFamily="@font/andika"
+                    android:textAlignment="center"
+                    android:layout_height="wrap_content"
+                    android:text="Date"
+                    android:textStyle="bold"
+                    android:id="@+id/orderDate"
+                    android:textSize="14sp" />
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Name"
+                android:textStyle="bold"
+                android:id="@+id/userName"
+                android:layout_marginBottom="4dp"
+                android:paddingStart="4dp"
+                android:textSize="18sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:paddingLeft="4dp"
+                android:textStyle="bold"
+                android:layout_marginBottom="4dp"
+                android:layout_height="wrap_content"
+                android:text="Shop Name"
+                android:id="@+id/shopName"
+                android:textSize="18sp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:paddingLeft="4dp"
+                android:textStyle="bold"
+                android:layout_marginBottom="4dp"
+                android:layout_height="wrap_content"
+                android:text="Address"
+                android:maxLines="2"
+                android:id="@+id/address"
+                android:textSize="16sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:paddingLeft="4dp"
+                android:textStyle="bold"
+                android:layout_marginBottom="4dp"
+                android:layout_height="wrap_content"
+                android:text="Mobile Number"
+                android:id="@+id/mobileNumber"
+                android:textSize="16sp" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:layout_width="match_parent"
+                android:id="@+id/subOrderRv"
+                android:layout_height="match_parent"/>
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:paddingStart="4dp"
+                        android:textColor="@color/colorPrimaryDark"
+                        android:fontFamily="@font/andika"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        android:layout_marginBottom="5dp"
+                        android:layout_height="wrap_content"
+                        android:text="Price Breakup"/>
+                    <LinearLayout
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:weightSum="4"
+                        android:layout_marginBottom="3dp"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Product Price"
+                            android:layout_weight="2"
+                            android:textStyle="bold"
+                            android:paddingStart="4dp"
+                            android:textSize="14sp" />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Name"
+                            android:layout_weight="2"
+                            android:textAlignment="textEnd"
+                            android:textStyle="bold"
+                            android:layout_marginEnd="4dp"
+                            android:id="@+id/productPrice"
+                            android:textSize="14sp" />
+                    </LinearLayout>
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:weightSum="4"
+                        android:layout_marginBottom="3dp"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="IGST: 9%"
+                            android:layout_weight="2"
+                            android:textStyle="bold"
+                            android:paddingStart="4dp"
+                            android:textSize="14sp" />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Name"
+                            android:layout_weight="2"
+                            android:textAlignment="textEnd"
+                            android:textStyle="bold"
+                            android:layout_marginEnd="4dp"
+                            android:id="@+id/igst"
+                            android:textSize="14sp" />
+                    </LinearLayout>
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:weightSum="4"
+                        android:layout_marginBottom="6dp"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="CST : 9%"
+                            android:layout_weight="2"
+                            android:textStyle="bold"
+                            android:paddingStart="4dp"
+                            android:textSize="14sp" />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Name"
+                            android:layout_marginEnd="4dp"
+                            android:layout_weight="2"
+                            android:textAlignment="textEnd"
+                            android:textStyle="bold"
+                            android:id="@+id/cst"
+                            android:textSize="14sp" />
+                    </LinearLayout>
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_marginBottom="3dp"
+                        android:background="@android:color/darker_gray"
+                        android:layout_height="0.5dp"/>
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:weightSum="4"
+                        android:layout_marginBottom="3dp"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Total Amount"
+                            android:textColor="@android:color/black"
+                            android:layout_weight="2"
+                            android:textStyle="bold"
+                            android:paddingStart="4dp"
+                            android:textSize="14sp" />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Name"
+                            android:layout_marginEnd="4dp"
+                            android:layout_weight="2"
+                            android:textAlignment="textEnd"
+                            android:textStyle="bold"
+                            android:id="@+id/payableAmount"
+                            android:textSize="14sp" />
+                    </LinearLayout>
+                    <View
+                        android:layout_width="match_parent"
+                        android:background="@android:color/darker_gray"
+                        android:layout_marginBottom="8dp"
+                        android:layout_height="0.5dp"/>
+
+
+
+                </LinearLayout>
+
+            </androidx.cardview.widget.CardView>
+
+
+
+        </LinearLayout>
+
+
+    </androidx.cardview.widget.CardView>
+
+
+</RelativeLayout>

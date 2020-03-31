@@ -30,7 +30,7 @@ interface APIServices {
     @POST("resetPassword")
     fun changePassword(@Body credentials: LoginCredentials): Call<ResponseBody>
 
-    @POST("users/addOrder/{id}")
+    @PUT("users/addOrder/{id}")
     fun addOrder(@Body order: Order,@Path("id") id: String, @Header("x-Auth-Token") authKey: String):Call<ResponseBody>
 
 

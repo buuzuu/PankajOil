@@ -1,5 +1,6 @@
 package com.example.pankajoil.bottomSheets
 
+import android.content.Context
 import android.os.Bundle
 import android.text.Editable
 import android.util.Log
@@ -17,10 +18,8 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.textfield.TextInputLayout
 import com.google.firebase.FirebaseException
 import com.google.firebase.FirebaseTooManyRequestsException
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
-import com.google.firebase.auth.PhoneAuthCredential
-import com.google.firebase.auth.PhoneAuthProvider
+import com.google.firebase.auth.*
+import dmax.dialog.SpotsDialog
 import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.Callback
@@ -44,6 +43,7 @@ class RegisterBottomSheet : BottomSheetDialogFragment() {
 
     private lateinit var callbacks: PhoneAuthProvider.OnVerificationStateChangedCallbacks
     private var storedVerificationId: String = ""
+    private var resendToken: String = ""
     private lateinit var mAuth: FirebaseAuth
 
 
@@ -55,7 +55,10 @@ class RegisterBottomSheet : BottomSheetDialogFragment() {
 
         super.onCreateView(inflater, container, savedInstanceState)
         view3 = inflater.inflate(R.layout.register_sheet, container, false)
+        register_dialog = SpotsDialog.Builder().setContext(view3.context).setTheme(R.style.Custom).setMessage("Getting OTP ...").setCancelable(false).build()
+
         setupID(view3)
+
         setupCallback()
         mAuth = FirebaseAuth.getInstance()
 
@@ -67,12 +70,11 @@ class RegisterBottomSheet : BottomSheetDialogFragment() {
                 gstin.editText!!.text.isNullOrBlank() ||
                 address.editText!!.text.isNullOrBlank()
             ) {
-                Toast.makeText(activity, "Please fill all the details", Toast.LENGTH_SHORT).show()
+                Toast.makeText(view3.context, "Please fill all the details", Toast.LENGTH_SHORT).show()
             } else {
                 Util.startLoading(register_dialog)
-                verify("+91" + mobileNumber.editText!!.text.toString())
+                verify( "+91"+mobileNumber.editText!!.text.toString())
                 Util.registerSheet.isCancelable = false
-                Util.startLoading(register_dialog)
 
             }
         }
@@ -98,10 +100,16 @@ class RegisterBottomSheet : BottomSheetDialogFragment() {
 
             override fun onVerificationCompleted(credential: PhoneAuthCredential) {
                 val smsCode: String? = credential.smsCode
+                Toast.makeText(activity!!.applicationContext,smsCode, Toast.LENGTH_SHORT).show()
+
                 if (!smsCode.isNullOrEmpty()) {
                     otp.editText!!.text =
                         Editable.Factory.getInstance().newEditable(smsCode)
                     verifyCode(smsCode)
+                    Util.stopLoading(register_dialog)
+                    Util.registerSheet.dismiss()
+                }else{
+                    sendToDatabase(credential)
                     Util.stopLoading(register_dialog)
                     Util.registerSheet.dismiss()
                 }
@@ -111,32 +119,49 @@ class RegisterBottomSheet : BottomSheetDialogFragment() {
                 if (e is FirebaseAuthInvalidCredentialsException) {
 
                     Toast.makeText(
-                        activity!!.applicationContext,
+                        view3.context,
                         "Invalid PhoneNumber",
                         Toast.LENGTH_SHORT
                     ).show()
+                    Util.stopLoading(register_dialog)
                     // [END_EXCLUDE]
                 } else if (e is FirebaseTooManyRequestsException) {
                     // The SMS quota for the project has been exceeded
                     Toast.makeText(
-                        activity!!.applicationContext,
+                        view3.context,
                         "Quota Exceeded",
                         Toast.LENGTH_SHORT
                     ).show()
+                    Util.stopLoading(register_dialog)
+                }else if (e is FirebaseAuthInvalidUserException) {
+                    // The SMS quota for the project has been exceeded
+                    Toast.makeText(
+                        view3.context,
+                        "Invalid User",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    Util.stopLoading(register_dialog)
                 }
 
             }
-
             override fun onCodeSent(
                 verificationId: String,
                 token: PhoneAuthProvider.ForceResendingToken
             ) {
                 super.onCodeSent(verificationId, token)
-                Log.d("TAG", "onCodeSent:$verificationId")
                 storedVerificationId = verificationId
+                resendToken = token.toString()
 
             }
+
+            override fun onCodeAutoRetrievalTimeOut(p0: String) {
+                super.onCodeAutoRetrievalTimeOut(p0)
+                Util.stopLoading(register_dialog)
+                Toast.makeText(view3.context,"Something went wrong.Please retry", Toast.LENGTH_SHORT).show()
+            }
         }
+
+
 
     }
 
@@ -149,8 +174,12 @@ class RegisterBottomSheet : BottomSheetDialogFragment() {
     fun verifyCode(code: String) {
         val credentials: PhoneAuthCredential =
             PhoneAuthProvider.getCredential(storedVerificationId, code)
+        sendToDatabase(credentials)
+    }
+
+    fun sendToDatabase(credential: PhoneAuthCredential){
         activity?.let {
-            mAuth.signInWithCredential(credentials).addOnCompleteListener(it) { task ->
+            mAuth.signInWithCredential(credential).addOnCompleteListener(it) { task ->
                 if (task.isSuccessful) {
                     //Code Verified
                     // Make network request
@@ -168,7 +197,7 @@ class RegisterBottomSheet : BottomSheetDialogFragment() {
                     val call = service.createUser(signup_user)
                     call.enqueue(object : Callback<ResponseBody> {
                         override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
-                            Toast.makeText(activity, "Something went wrong", Toast.LENGTH_SHORT)
+                            Toast.makeText(view3.context, "Something went wrong", Toast.LENGTH_SHORT)
                                 .show()
                         }
 
@@ -180,14 +209,14 @@ class RegisterBottomSheet : BottomSheetDialogFragment() {
                                 200 -> {
 
                                     Util.registerSheet.dismiss()
-                                    Toast.makeText(activity, "Account Created", Toast.LENGTH_LONG).show()
+                                    Toast.makeText(view3.context, "Account Created", Toast.LENGTH_LONG).show()
 
                                 }
                                 400 -> {
                                     Toast.makeText(
-                                        activity,
+                                        view3.context,
                                         "Number Already Registered",
-                                        Toast.LENGTH_SHORT
+                                        Toast.LENGTH_LONG
                                     ).show()
 
                                 }

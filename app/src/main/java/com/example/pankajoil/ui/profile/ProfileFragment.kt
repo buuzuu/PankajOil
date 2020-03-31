@@ -1,6 +1,7 @@
 package com.example.jetpack_kotlin.ui.home
 
 
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -10,6 +11,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ImageView
+import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.example.pankajoil.R
@@ -21,6 +23,8 @@ import com.example.pankajoil.utils.ProgressRequestBody
 import com.example.pankajoil.utils.Util
 import com.squareup.picasso.Picasso
 import de.hdodenhof.circleimageview.CircleImageView
+import dmax.dialog.SpotsDialog
+import kotlinx.android.synthetic.main.fragment_profile.*
 import okhttp3.MultipartBody
 import retrofit2.Call
 import retrofit2.Callback
@@ -30,11 +34,20 @@ class ProfileFragment : Fragment(), ProgressRequestBody.UploadCallbacks {
 
 
     lateinit var logout: Button
+    lateinit var orderCount: TextView
+    lateinit var wishlistCount: TextView
     lateinit var editImage: CircleImageView
     lateinit var profileImage: CircleImageView
     lateinit var preference: TokenSharedPreference
     private var PICK_IMAGE = 100
     private var link:String? = null
+    private lateinit var dialog: android.app.AlertDialog
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        dialog = SpotsDialog.Builder().setContext(activity).setTheme(R.style.Custom)
+            .setMessage("Uploading...").setCancelable(false).build()
+    }
 
 
 
@@ -46,6 +59,8 @@ class ProfileFragment : Fragment(), ProgressRequestBody.UploadCallbacks {
 
         val root = inflater.inflate(R.layout.fragment_profile, container, false)
         logout = root.findViewById(R.id.logout)
+        orderCount = root.findViewById(R.id.orderCount)
+        wishlistCount = root.findViewById(R.id.wishlistCount)
         setupViews(root)
         logout.setOnClickListener {
             Util.signOut(
@@ -60,6 +75,9 @@ class ProfileFragment : Fragment(), ProgressRequestBody.UploadCallbacks {
                 .replace(R.id.host_fragment, HomeFragment())
                 .commit()
         }
+
+        orderCount.text = Util.user!!.orders.size.toString()
+        wishlistCount.text = Util.user!!.wishlistProducts.size.toString()
         profileImage.setOnClickListener {
         }
 
@@ -81,9 +99,7 @@ class ProfileFragment : Fragment(), ProgressRequestBody.UploadCallbacks {
         preference = TokenSharedPreference(activity!!.applicationContext)
         if (preference.isTokenPresent()) {
             link = Util.user!!.profileImage
-            if (link!!.length < 5){
-                Toast.makeText(activity, "Wrong with profile link", Toast.LENGTH_SHORT).show()
-            }
+
         }
 
     }
@@ -91,7 +107,19 @@ class ProfileFragment : Fragment(), ProgressRequestBody.UploadCallbacks {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        Picasso.get().load(link).into(profileImage)
+        if (!link.isNullOrEmpty()){
+            Picasso.get().load(link).into(profileImage)
+        }else{
+            profileImage.setImageResource(R.drawable.test_image)
+        }
+        gstin.text = Util.user!!.gstin
+        shopName.text = Util.user!!.companyName
+        mobileNumber.text = Util.user!!.mobileNumber.toString()
+        email.text = Util.user!!.email
+        address.text = Util.user!!.address
+
+
+
 
     }
 
@@ -107,7 +135,7 @@ class ProfileFragment : Fragment(), ProgressRequestBody.UploadCallbacks {
 //                file
 //            )
             val requestFile = ProgressRequestBody(file, this)
-
+            Util.startLoading(dialog)
 
             val body: MultipartBody.Part =
                 MultipartBody.Part.createFormData("profile_image", file.name, requestFile)
@@ -136,6 +164,7 @@ class ProfileFragment : Fragment(), ProgressRequestBody.UploadCallbacks {
                             Picasso.get().load(success.success).into(Util.profilePicture)
                             Picasso.get().load(success.success).into(profileImage)
                             Util.user!!.profileImage = success.success
+                            Util.stopLoading(dialog)
 
                         }
                         400 -> {
@@ -161,7 +190,6 @@ class ProfileFragment : Fragment(), ProgressRequestBody.UploadCallbacks {
 
     override fun onProgressUpdate(percentage: Int) {
 
-        Log.d("TAG", percentage.toString())
     }
 
     override fun onError() {

@@ -44,7 +44,11 @@ class Cart : AppCompatActivity() {
         supportActionBar?.setDisplayShowTitleEnabled(false)
         Util.cartItem = toolbar.findViewById(R.id.cartItem)
         cartItem.textAlignment = View.TEXT_ALIGNMENT_TEXT_START
-        orders_rv.layoutManager = LinearLayoutManager(this)
+        val layoutManager = LinearLayoutManager(this)
+      //  layoutManager.stackFromEnd = true
+        layoutManager.reverseLayout = true
+
+        orders_rv.layoutManager = layoutManager
         CoroutineScope(IO).launch {
             list = dao.getAllOrder()
             if (list.isEmpty()) {
@@ -112,6 +116,7 @@ class Cart : AppCompatActivity() {
             cartAdapter = CartAdapter(list as ArrayList<OrderEntity>,this)
             orders_rv.adapter = cartAdapter
             cartAdapter.notifyDataSetChanged()
+
 
         }
     }

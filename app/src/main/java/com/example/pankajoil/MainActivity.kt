@@ -167,9 +167,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         }
 
     }
-
-
-
     private fun loadUserDetails(mobileNumber: String, authKey: String) {
         val service: APIServices = Util.generalRetrofit.create(APIServices::class.java)
         val call = service.getUserDetails(
@@ -186,14 +183,14 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 when (response.code()) {
                     200 -> {
                         Util.user = response.body()
-                        Log.d("TAG", Util.user!!.profileImage)
-                        Picasso.get().load(Util.user!!.profileImage).into(Util.profilePicture!!)
-                        Toast.makeText(
-                            this@MainActivity,
-                            Util.user!!.wishlistProducts.size.toString(),
-                            Toast.LENGTH_LONG
-                        )
-                            .show()
+                        Util.header_name!!.text = "Hello "+Util.user!!.firstName+ "!"
+                        Util.header_mobile!!.text = "+91 "+Util.user!!.mobileNumber.toString()
+                        if (Util.user!!.profileImage.isNotEmpty()){
+                            Picasso.get().load(Util.user!!.profileImage).into(Util.profilePicture!!)
+                        }else{
+                            Util.profilePicture?.setImageResource(R.drawable.test_image)
+                        }
+
                         Util.stopLoading(dialog)
 
 
@@ -356,8 +353,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
             }
             R.id.nav_orders -> {
-                fragment = OrderFragment()
-
+                if (TokenSharedPreference(this).isTokenPresent()) {
+                    fragment = OrderFragment()
+                } else {
+                    Toast.makeText(this, "Sign in your account ", Toast.LENGTH_SHORT).show()
+                }
             }
             R.id.nav_wishList -> {
                 fragment = WishlistFragment()

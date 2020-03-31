@@ -62,11 +62,10 @@ class CartAdapter(val orderList: ArrayList<OrderEntity>, ctx: Context) :
                     dao.deleteOrder(orderList[position])
                 }catch (e:Exception){
                     Log.d("TAGG", e.message)
-
                 }
             }
             notifyItemRemoved(position)
-            notifyDataSetChanged()
+//            notifyDataSetChanged()
             orderList.remove(orderList[position])
             try {
                 Util.cartItem!!.text = "My Cart(${orderList.size})"
@@ -106,7 +105,7 @@ class CartAdapter(val orderList: ArrayList<OrderEntity>, ctx: Context) :
                     dao.updateOrder(updateOrder)
                 }
                 notifyItemChanged(position,updateOrder)
-                notifyDataSetChanged()
+//                notifyDataSetChanged()
                 mAlertDialog.dismiss()
             }
 

@@ -29,6 +29,7 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import java.text.NumberFormat
+import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.math.roundToInt
 
@@ -154,7 +155,9 @@ class OrderSummary : AppCompatActivity() {
 
     fun createOrder() {
 
-        val order = Order(generateOrderItem(),"AS34DF56TR", finalPrice.roundToInt(),
+        val order = Order(generateOrderItem(),"AS34DF56TR",
+            SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(Date()).toString(),
+            finalPrice.roundToInt(),
             Util.user!!.companyName,Util.user!!.address, getPaymentStatus())
         val call = service.addOrder(order,TokenSharedPreference(this).getMobileNumber(),TokenSharedPreference(this).getAuthKey() )
         call.enqueue(object :Callback<ResponseBody>{
@@ -163,6 +166,10 @@ class OrderSummary : AppCompatActivity() {
             }
             override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
                 Toast.makeText(this@OrderSummary, "Order Posted", Toast.LENGTH_SHORT).show()
+              //  var tempList = ArrayList<Order>()
+                var tempList = Util.user!!.orders as ArrayList<Order>
+                tempList.add(order)
+                Util.user!!.orders = tempList
             }
 
         })
