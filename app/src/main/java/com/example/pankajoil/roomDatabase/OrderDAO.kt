@@ -16,8 +16,8 @@ interface OrderDAO {
     @Update
     suspend fun updateOrder(item: OrderEntity)
 
-    @Delete
-    suspend fun deleteOrder(item: OrderEntity)
+    @Query("DELETE FROM order_item WHERE uID = :item")
+    suspend fun deleteOrder(item: String)
 
 
 

@@ -46,7 +46,7 @@ class Cart : AppCompatActivity() {
         cartItem.textAlignment = View.TEXT_ALIGNMENT_TEXT_START
         val layoutManager = LinearLayoutManager(this)
       //  layoutManager.stackFromEnd = true
-        layoutManager.reverseLayout = true
+       // layoutManager.reverseLayout = true
 
         orders_rv.layoutManager = layoutManager
         CoroutineScope(IO).launch {
@@ -73,13 +73,13 @@ class Cart : AppCompatActivity() {
         }
    }
 
-    override fun onPause() {
-        super.onPause()
-        CoroutineScope(IO).launch {
-            list = dao.getAllOrder()
-        }
-
-    }
+//    override fun onStart() {
+//        super.onStart()
+//        CoroutineScope(IO).launch {
+//            list = dao.getAllOrder()
+//        }
+//
+//    }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
@@ -116,6 +116,7 @@ class Cart : AppCompatActivity() {
             cartAdapter = CartAdapter(list as ArrayList<OrderEntity>,this)
             orders_rv.adapter = cartAdapter
             cartAdapter.notifyDataSetChanged()
+
 
 
         }

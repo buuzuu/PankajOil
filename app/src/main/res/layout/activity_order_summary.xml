@@ -123,12 +123,23 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:text="ID"
+                    android:textStyle="bold"
+                    android:id="@+id/id"
+                    android:textColor="@android:color/black"
+                    android:layout_marginBottom="8dp"
+                    android:paddingStart="4dp"
+                    android:textSize="18sp" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     android:text="Name"
                     android:textStyle="bold"
                     android:id="@+id/userName"
                     android:layout_marginBottom="8dp"
                     android:paddingStart="4dp"
                     android:textSize="18sp" />
+
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -337,7 +348,8 @@
                         android:layout_marginTop="8dp"
                         android:layout_height="wrap_content"
                         android:weightSum="4"
-                        android:layout_margin="5dp"
+                        android:layout_margin="8dp"
+                        android:padding="2dp"
                         android:orientation="horizontal">
                         <RadioButton android:id="@+id/now"
                             android:layout_width="match_parent"

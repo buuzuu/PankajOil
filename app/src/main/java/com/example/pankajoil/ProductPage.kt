@@ -61,8 +61,6 @@ class ProductPage : AppCompatActivity() {
         Util.prod_Item_Price!!.text = "₹ ${Util.current_Variant!!.price}"
         Util.prod_About!!.text = product!!.description
 
-
-
         if (TokenSharedPreference(this@ProductPage).isTokenPresent()) {
             setSparkButton(Util.user!!, product!!.uniqueID)
         }
@@ -230,9 +228,6 @@ class ProductPage : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        if (TokenSharedPreference(this@ProductPage).isTokenPresent()) {
-            setSparkButton(Util.user!!, product!!.uniqueID)
-        }
 
     }
 

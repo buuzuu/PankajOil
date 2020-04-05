@@ -2,6 +2,7 @@ package com.example.pankajoil.adapter
 
 import android.app.AlertDialog
 import android.content.Context
+import android.content.DialogInterface
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -23,6 +24,9 @@ import kotlinx.android.synthetic.main.quantity_popup.view.*
 import kotlinx.android.synthetic.main.quantity_popup.view.apply
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Dispatchers.Default
+import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.launch
 import java.lang.Exception
 import java.text.DecimalFormat
@@ -39,7 +43,6 @@ class CartAdapter(val orderList: ArrayList<OrderEntity>, ctx: Context) :
     init {
         dao = database.movieDao()
         context = ctx
-
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CartViewHolder {
@@ -53,32 +56,38 @@ class CartAdapter(val orderList: ArrayList<OrderEntity>, ctx: Context) :
     }
 
     override fun onBindViewHolder(holder: CartViewHolder, position: Int) {
-
-
         holder.initialize(orderList[position])
         holder.remove.setOnClickListener {
-            CoroutineScope(Dispatchers.IO).launch {
+            val mBuilder = AlertDialog.Builder(context)
+            mBuilder.setMessage("Do you want to delete ?")
+            mBuilder.setCancelable(false)
+            mBuilder.setPositiveButton("Yes" ) { dialog, which ->
+                CoroutineScope(IO).launch {
+                    try {
+                       // Log.d("Tag",position.toString() + "  ^  "+ orderList.size.toString() )
+                        dao.deleteOrder(orderList[position].uniqueID)
+                    }catch (e:Exception){
+                        Log.d("Tag",e.message)
+                       // Log.d("Tag",position.toString() + "  ^  "+ orderList.size.toString() )
+                    }
+                }
+                notifyItemRemoved(position)
+                orderList.remove(orderList[position])
                 try {
-                    dao.deleteOrder(orderList[position])
+                    Util.cartItem!!.text = "My Cart(${orderList.size})"
+                    if (orderList.isEmpty() || orderList.size <1){
+                        Util.empty_Image!!.visibility = View.VISIBLE
+                        Util.cart_Bottom!!.visibility = View.INVISIBLE
+                    }
                 }catch (e:Exception){
-                    Log.d("TAGG", e.message)
+                    Util.cartItem!!.text = "My Cart"
                 }
             }
-            notifyItemRemoved(position)
-//            notifyDataSetChanged()
-            orderList.remove(orderList[position])
-            try {
-                Util.cartItem!!.text = "My Cart(${orderList.size})"
-                if (orderList.isEmpty() || orderList.size <1){
-                    Util.empty_Image!!.visibility = View.VISIBLE
-                    Util.cart_Bottom!!.visibility = View.INVISIBLE
-
-                }
-
-            }catch (e:Exception){
-                Util.cartItem!!.text = "My Cart"
+            mBuilder.setNegativeButton("No"
+            ) { dialog, _ ->
+                dialog.dismiss()
             }
-
+            val  mAlertDialog = mBuilder.show()
 
 }
         holder.quantity.setOnClickListener {
@@ -86,6 +95,7 @@ class CartAdapter(val orderList: ArrayList<OrderEntity>, ctx: Context) :
         }
 
     }
+
     fun populateView(position: Int){
         val mDialogView = LayoutInflater.from(context).inflate(R.layout.quantity_popup, null)
         val mBuilder = AlertDialog.Builder(context).setView(mDialogView)
@@ -105,7 +115,6 @@ class CartAdapter(val orderList: ArrayList<OrderEntity>, ctx: Context) :
                     dao.updateOrder(updateOrder)
                 }
                 notifyItemChanged(position,updateOrder)
-//                notifyDataSetChanged()
                 mAlertDialog.dismiss()
             }
 
@@ -143,20 +152,17 @@ class CartAdapter(val orderList: ArrayList<OrderEntity>, ctx: Context) :
             pieces.text = "${order.perCarton.toString()} pieces per carton"
             Picasso.get().load(order.url).into(image)
             price.text = "₹ ${NumberFormat.getNumberInstance(Locale.US).format(order.amount)}"
-
-
         }
 
         init {
             Util.qty = itemView.findViewById(R.id.qty)
             itemView.setOnClickListener(this)
 
-
         }
         override fun onClick(v: View?) {
-
-
         }
+
+
 
 
 
