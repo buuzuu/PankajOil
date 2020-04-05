@@ -1,5 +1,6 @@
 package com.example.pankajoil.adapter
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -17,9 +18,9 @@ import kotlin.math.roundToInt
 
 class OrdersAdapter(var list:List<Order>): RecyclerView.Adapter<OrdersAdapter.OrderViewHolder>() {
     var prodPrice: Int? = 0
-    var igstPrice: Double? = null
+    var igstPrice: Double? =null
     var cstPrice: Double? = null
-    var finalPrice: Float = 0.0f
+    var finalPrice: Double? = null
     var subAdapter: SubOrderAdapter?=null
     var pool:RecyclerView.RecycledViewPool?=null
     init {
@@ -36,7 +37,15 @@ class OrdersAdapter(var list:List<Order>): RecyclerView.Adapter<OrdersAdapter.Or
     }
 
     override fun onBindViewHolder(holder: OrderViewHolder, position: Int) {
-        computeProductPrice(list[0].items)
+
+        for (item in list[position].items){
+            Log.e("OR",item.amount.toString())
+            prodPrice = item.amount + prodPrice!!
+            igstPrice = (0.09 * prodPrice!!)
+            cstPrice = (0.09 * prodPrice!!)
+
+        }
+        finalPrice = (prodPrice!! + igstPrice!! + cstPrice!!)
         holder.orderID.text = list[position].orderID
         holder.orderDate.text = list[position].orderDate
         holder.userName.text =  Util.user!!.firstName+" "+Util.user!!.lastName
@@ -44,30 +53,18 @@ class OrdersAdapter(var list:List<Order>): RecyclerView.Adapter<OrdersAdapter.Or
         holder.address.text = Util.user!!.address
         holder.mobileNumber.text = Util.user!!.mobileNumber.toString()
         holder.productPrice.text = "₹ ${NumberFormat.getNumberInstance(Locale.US).format(prodPrice)}"
-        holder.igst.text = "₹ ${NumberFormat.getNumberInstance(Locale.US).format(igstPrice)}"
-        holder.cst.text = "₹ ${NumberFormat.getNumberInstance(Locale.US).format(cstPrice)}"
-        holder.payableAmount.text = "₹ ${NumberFormat.getNumberInstance(Locale.US).format(finalPrice.roundToInt())}"
+        holder.igst.text = "₹ ${NumberFormat.getNumberInstance(Locale.US).format(igstPrice!!)}"
+        holder.cst.text = "₹ ${NumberFormat.getNumberInstance(Locale.US).format(cstPrice!!)}"
+        holder.payableAmount.text = "₹ ${NumberFormat.getNumberInstance(Locale.US).format(finalPrice!!.roundToInt())}"
 
         subAdapter = SubOrderAdapter(list[position].items)
         holder.subRecyclerView.adapter = subAdapter
         holder.subRecyclerView.setRecycledViewPool(pool)
+        prodPrice = 0
+        igstPrice = 0.0
+        cstPrice = 0.0
+        finalPrice = 0.0
     }
-    private fun computeProductPrice(list: List<Item>) {
-
-        for (order in list) {
-            prodPrice = prodPrice?.plus(order.amount)
-        }
-
-        if (prodPrice != null) {
-            igstPrice = (0.09 * prodPrice!!)
-            cstPrice = (0.09 * prodPrice!!)
-            finalPrice = (prodPrice!! + igstPrice!! + cstPrice!!).toFloat()
-        }
-
-
-    }
-
-
 
     inner class OrderViewHolder(itemView: View) :RecyclerView.ViewHolder(itemView) {
         var subRecyclerView:RecyclerView = itemView.findViewById(R.id.subOrderRv)

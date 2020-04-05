@@ -4,28 +4,28 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
-import android.graphics.Color
 import android.os.Bundle
-import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.view.inputmethod.InputMethodManager
-import android.widget.*
+import android.widget.Button
+import android.widget.ImageView
+import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.SearchView
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import com.example.jetpack_kotlin.ui.home.*
 import com.example.pankajoil.data.LoginCredentials
-import com.example.pankajoil.data.Product
 import com.example.pankajoil.data.User
+import com.example.pankajoil.roomDatabase.OrderDAO
+import com.example.pankajoil.roomDatabase.OrderDatabase
 import com.example.pankajoil.service.APIServices
-import com.example.pankajoil.service.RetrofitService
 import com.example.pankajoil.utils.Util
 import com.google.android.material.navigation.NavigationView
 import com.google.android.material.textfield.TextInputLayout
@@ -39,6 +39,9 @@ import com.karumi.dexter.listener.multi.MultiplePermissionsListener
 import com.squareup.picasso.Picasso
 import de.hdodenhof.circleimageview.CircleImageView
 import dmax.dialog.SpotsDialog
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import org.json.JSONObject
 import retrofit2.Call
 import retrofit2.Callback
@@ -59,11 +62,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     private lateinit var signin: Button
     private lateinit var forgot_text: TextView
-
     private lateinit var dialog: android.app.AlertDialog
     private lateinit var alert: AlertDialog
     private lateinit var login_number: TextInputLayout
     private lateinit var login_password: TextInputLayout
+
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -79,7 +82,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         navView = findViewById(R.id.nav_view)
         headerView = navView.getHeaderView(0)
         banner = findViewById(R.id.image_id)
-        dialog = SpotsDialog.Builder().setContext(this).setTheme(R.style.Custom).setMessage("Loading...").setCancelable(false).build()
+        dialog =
+            SpotsDialog.Builder().setContext(this).setTheme(R.style.Custom).setMessage("Loading...")
+                .setCancelable(false).build()
 
         Util.signin_text = headerView.findViewById(R.id.signin) as TextView
         Util.register = headerView.findViewById(R.id.register) as TextView
@@ -95,6 +100,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             .withListener(object : MultiplePermissionsListener {
                 override fun onPermissionsChecked(report: MultiplePermissionsReport?) {
                 }
+
                 override fun onPermissionRationaleShouldBeShown(
                     permissions: MutableList<PermissionRequest>?,
                     token: PermissionToken?
@@ -153,7 +159,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 Util.startLoading(dialog)
 
                 getJWTToken(
-                     alert,
+                    alert,
                     login_number.editText!!.text.toString(),
                     login_password.editText!!.text.toString(), this
                 )
@@ -166,7 +172,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             Util.registerSheet.show(supportFragmentManager, "RegisterBottomSheet")
         }
 
+
+
+
     }
+
     private fun loadUserDetails(mobileNumber: String, authKey: String) {
         val service: APIServices = Util.generalRetrofit.create(APIServices::class.java)
         val call = service.getUserDetails(
@@ -175,19 +185,24 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         )
         call.enqueue(object : Callback<User> {
             override fun onFailure(call: Call<User>, t: Throwable) {
-                Toast.makeText(this@MainActivity, t.message+"- Restart the app", Toast.LENGTH_LONG).show()
+                Toast.makeText(
+                    this@MainActivity,
+                    t.message + "- Restart the app",
+                    Toast.LENGTH_LONG
+                ).show()
                 Util.stopLoading(dialog)
                 logout()
             }
+
             override fun onResponse(call: Call<User>, response: Response<User>) {
                 when (response.code()) {
                     200 -> {
                         Util.user = response.body()
-                        Util.header_name!!.text = "Hello "+Util.user!!.firstName+ "!"
-                        Util.header_mobile!!.text = "+91 "+Util.user!!.mobileNumber.toString()
-                        if (Util.user!!.profileImage.isNotEmpty()){
+                        Util.header_name!!.text = "Hello " + Util.user!!.firstName + "!"
+                        Util.header_mobile!!.text = "+91 " + Util.user!!.mobileNumber.toString()
+                        if (Util.user!!.profileImage.isNotEmpty()) {
                             Picasso.get().load(Util.user!!.profileImage).into(Util.profilePicture!!)
-                        }else{
+                        } else {
                             Util.profilePicture?.setImageResource(R.drawable.test_image)
                         }
 
@@ -315,7 +330,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.main, menu)
-
         return true
     }
 
@@ -327,7 +341,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 true
             }
             R.id.action_search -> {
-                startActivity(Intent(this,SearchActivity::class.java ))
+                startActivity(Intent(this, SearchActivity::class.java))
                 true
             }
             else -> super.onOptionsItemSelected(item)
@@ -348,7 +362,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 }
             }
             R.id.nav_cart -> {
-              //  fragment = CartFragment()
+                //  fragment = CartFragment()
                 startActivity(Intent(this, Cart::class.java))
 
             }
@@ -360,7 +374,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 }
             }
             R.id.nav_wishList -> {
-                fragment = WishlistFragment()
+                if (TokenSharedPreference(this).isTokenPresent()) {
+                    fragment = WishlistFragment()
+                } else {
+                    Toast.makeText(this, "Sign in your account ", Toast.LENGTH_SHORT).show()
+                }
 
             }
             R.id.nav_notification -> {
@@ -404,7 +422,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     }
 
-     fun logout() {
+    fun logout() {
         Util.signOut(
             Util.header_name!!,
             Util.header_mobile!!,

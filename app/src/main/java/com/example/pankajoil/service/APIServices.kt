@@ -1,18 +1,12 @@
 package com.example.pankajoil.service
 
 import com.example.pankajoil.data.*
-import com.example.pankajoil.utils.Util
-import okhttp3.Cache
 import okhttp3.MultipartBody
-import okhttp3.OkHttpClient
 import okhttp3.ResponseBody
 import org.json.JSONObject
 import retrofit2.Call
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.*
-import java.util.*
-import java.util.concurrent.TimeUnit
+import retrofit2.http.Body
 
 
 interface APIServices {
@@ -33,6 +27,14 @@ interface APIServices {
     @PUT("users/addOrder/{id}")
     fun addOrder(@Body order: Order,@Path("id") id: String, @Header("x-Auth-Token") authKey: String):Call<ResponseBody>
 
+    @POST("paytm/generate_checksum")
+    fun getPaytmChecksum(@Body payObj:PaytmPostObject):Call<Checksum>
+
+    @POST("paytm/transaction")
+    fun getPaytmTxnToken(@Body payObj:PaytmPostObject):Call<TxnToken>
+
+    @POST("payumoney/generate_checksum")
+    fun getPayumoneyChecksum(@Body payumoney:PayumoneyPostObject): Call<Checksum>
 
 
     @POST("users")

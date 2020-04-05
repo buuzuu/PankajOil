@@ -6,6 +6,8 @@ import com.google.gson.annotations.SerializedName
 data class Order(
     var items: List<Item>,
     var orderID: String,
+    var refNo: String,
+    var txnId: String,
     var orderDate: String,
     var totalAmount: Int,
     var companyName: String,

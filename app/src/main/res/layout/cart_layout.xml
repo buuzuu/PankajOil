@@ -140,7 +140,7 @@
 
             </LinearLayout>
 
-            <TextView
+            <Button
                 android:id="@+id/remove"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -149,19 +149,18 @@
                 android:layout_marginTop="8dp"
                 android:layout_marginBottom="8dp"
                 android:background="@drawable/selected_variant"
-                android:drawableStart="@drawable/ic_delete_black_24dp"
                 android:padding="3dp"
                 android:text="Remove"
                 android:textAlignment="center"
-                android:textColor="@color/colorPrimary" />
+                android:textColor="@android:color/white" />
 
-            <!--            <View-->
-            <!--                android:layout_width="match_parent"-->
-            <!--                android:layout_height="0.2dp"-->
-            <!--                android:layout_below="@+id/remove"-->
-            <!--                android:layout_gravity="bottom"-->
-            <!--                android:layout_marginBottom="2dp"-->
-            <!--                android:background="@android:color/black" />-->
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="0.2dp"
+                            android:layout_below="@+id/remove"
+                            android:layout_gravity="bottom"
+                            android:layout_marginBottom="2dp"
+                            android:background="@android:color/black" />
 
         </RelativeLayout>
 
