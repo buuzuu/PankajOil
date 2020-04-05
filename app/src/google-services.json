@@ -1,0 +1,56 @@
+{
+  "project_info": {
+    "project_number": "413792905928",
+    "firebase_url": "https://pankajoil.firebaseio.com",
+    "project_id": "pankajoil",
+    "storage_bucket": "pankajoil.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:413792905928:android:3dda313ea18bbd4bdbd3fd",
+        "android_client_info": {
+          "package_name": "com.example.pankajoil"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "413792905928-lonu83btskahsdbih4u8uq93sjo5adb4.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.pankajoil",
+            "certificate_hash": "cc1087922113b8afb46cdf8ea5d20a41e3743ba8"
+          }
+        },
+        {
+          "client_id": "413792905928-n9svjm55dr59k257skp9b8p3jffnvf5u.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.pankajoil",
+            "certificate_hash": "abeaa0218a455a3f13e9301fbf16f56ebc6bae62"
+          }
+        },
+        {
+          "client_id": "413792905928-gqos5co2mo7c50vb8uo4d3di3omrl6l5.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAGUnTc3PQlc0G7tAcd2qYuVSpkKCmqtJY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "413792905928-gqos5co2mo7c50vb8uo4d3di3omrl6l5.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
