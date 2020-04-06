@@ -128,37 +128,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         setRemoteConfig()
 
         Util.signin_text!!.setOnClickListener {
-            if (drawerLayout.isDrawerOpen(GravityCompat.START)) drawerLayout.closeDrawer(
-                GravityCompat.START
-            )
-            val dialogBuilder = AlertDialog.Builder(this, R.style.MyDialogTheme)
-            val view: View = layoutInflater.inflate(R.layout.signin_layout, null)
-            signin = view.findViewById(R.id.signin_btn)
-            forgot_text = view.findViewById(R.id.forgot_text)
-            login_number = view.findViewById(R.id.mobileNumber_Layout)
-            login_password = view.findViewById(R.id.password_Layout)
-            dialogBuilder.setView(view)
-            dialogBuilder.setCancelable(true)
-            alert = dialogBuilder.create()
-            alert.show()
-            forgot_text.setOnClickListener {
-                alert.dismiss()
-                Util.passwordSheet.show(supportFragmentManager, "PasswordResetBottomSheet")
-            }
-            signin.setOnClickListener {
-                val view = this.currentFocus
-                view?.let { v ->
-                    val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
-                    imm?.hideSoftInputFromWindow(v.windowToken, 0)
-                }
-                Util.startLoading(dialog)
-
-                getJWTToken(
-                    alert,
-                    login_number.editText!!.text.toString(),
-                    login_password.editText!!.text.toString(), this
-                )
-            }
+            loginPopup()
         }
         Util.register!!.setOnClickListener {
             if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
@@ -168,9 +138,42 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         }
 
 
-
-
     }
+
+    fun loginPopup() {
+        if (drawerLayout.isDrawerOpen(GravityCompat.START)) drawerLayout.closeDrawer(
+            GravityCompat.START
+        )
+        val dialogBuilder = AlertDialog.Builder(this, R.style.MyDialogTheme)
+        val view: View = layoutInflater.inflate(R.layout.signin_layout, null)
+        signin = view.findViewById(R.id.signin_btn)
+        forgot_text = view.findViewById(R.id.forgot_text)
+        login_number = view.findViewById(R.id.mobileNumber_Layout)
+        login_password = view.findViewById(R.id.password_Layout)
+        dialogBuilder.setView(view)
+        dialogBuilder.setCancelable(true)
+        alert = dialogBuilder.create()
+        alert.show()
+        forgot_text.setOnClickListener {
+            alert.dismiss()
+            Util.passwordSheet.show(supportFragmentManager, "PasswordResetBottomSheet")
+        }
+        signin.setOnClickListener {
+            val view = this.currentFocus
+            view?.let { v ->
+                val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
+                imm?.hideSoftInputFromWindow(v.windowToken, 0)
+            }
+            Util.startLoading(dialog)
+
+            getJWTToken(
+                alert,
+                login_number.editText!!.text.toString(),
+                login_password.editText!!.text.toString(), this
+            )
+        }
+    }
+
 
     private fun loadUserDetails(mobileNumber: String, authKey: String) {
         val service: APIServices = Util.generalRetrofit.create(APIServices::class.java)
@@ -180,11 +183,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         )
         call.enqueue(object : Callback<User> {
             override fun onFailure(call: Call<User>, t: Throwable) {
-                Toast.makeText(
-                    this@MainActivity,
-                    t.message + "- Restart the app",
-                    Toast.LENGTH_LONG
-                ).show()
+
+                Util.showToast(this@MainActivity, t.message + "- Restart the app", 1)
+
                 Util.stopLoading(dialog)
                 logout()
             }
@@ -206,8 +207,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
                     }
                     400 -> {
-                        Toast.makeText(this@MainActivity, "Number Unregistered", Toast.LENGTH_SHORT)
-                            .show()
+                        Util.showToast(this@MainActivity, "Number not registered", 0)
+
                         Util.stopLoading(dialog)
 
                     }
@@ -233,7 +234,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         call.enqueue(object : Callback<JSONObject> {
             override fun onFailure(call: Call<JSONObject>, t: Throwable) {
                 Util.stopLoading(dialog)
-                Toast.makeText(this@MainActivity, "Failed", Toast.LENGTH_SHORT).show()
+                Util.showToast(this@MainActivity, "Failed", 0)
+
             }
 
             override fun onResponse(call: Call<JSONObject>, response: Response<JSONObject>) {
@@ -260,20 +262,17 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                     }
 
                     400 -> {
-                        Toast.makeText(
-                            this@MainActivity,
-                            "Wrong Password or Mobile Number",
-                            Toast.LENGTH_SHORT
-                        ).show()
+
+                        Util.showToast(
+                            this@MainActivity, "Wrong Password or Mobile Number",
+                            0
+                        )
+
                         Util.stopLoading(dialog)
                     }
                     else -> {
-                        Toast.makeText(
-                            this@MainActivity,
-                            "Something went wrong...",
-                            Toast.LENGTH_SHORT
-                        )
-                            .show()
+                        Util.showToast(this@MainActivity, "Something went wrong...", 0)
+
                         Util.stopLoading(dialog)
 
                     }
@@ -334,7 +333,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 if (TokenSharedPreference(this).isTokenPresent()) {
                     startActivity(Intent(this, Cart::class.java))
                 } else {
-                    Toast.makeText(this, "Sign in your account ", Toast.LENGTH_SHORT).show()
+                    Util.showToast(this, "Sign in your account ", 0)
                 }
 
                 true
@@ -357,7 +356,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 if (TokenSharedPreference(this).isTokenPresent()) {
                     fragment = ProfileFragment()
                 } else {
-                    Toast.makeText(this, "Sign in your account ", Toast.LENGTH_SHORT).show()
+                    loginPopup()
                 }
             }
             R.id.nav_cart -> {
@@ -365,7 +364,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 if (TokenSharedPreference(this).isTokenPresent()) {
                     startActivity(Intent(this, Cart::class.java))
                 } else {
-                    Toast.makeText(this, "Sign in your account ", Toast.LENGTH_SHORT).show()
+                    loginPopup()
                 }
 
             }
@@ -373,19 +372,20 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 if (TokenSharedPreference(this).isTokenPresent()) {
                     fragment = OrderFragment()
                 } else {
-                    Toast.makeText(this, "Sign in your account ", Toast.LENGTH_SHORT).show()
+                    loginPopup()
                 }
             }
             R.id.nav_wishList -> {
                 if (TokenSharedPreference(this).isTokenPresent()) {
                     fragment = WishlistFragment()
                 } else {
-                    Toast.makeText(this, "Sign in your account ", Toast.LENGTH_SHORT).show()
+                    loginPopup()
                 }
 
             }
             R.id.nav_notification -> {
                 fragment = NotificationFragment()
+                Util.showToast(this, "Gello", 0)
 
             }
             R.id.nav_feedback -> {

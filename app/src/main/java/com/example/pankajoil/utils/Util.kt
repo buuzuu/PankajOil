@@ -1,25 +1,25 @@
 package com.example.pankajoil.utils
 
 import android.content.Context
+import android.graphics.Color
 import android.view.View
 import android.widget.ImageView
-import android.widget.LinearLayout
 import android.widget.TextView
-import com.example.pankajoil.bottomSheets.PasswordResetBottomSheet
+import android.widget.Toast
 import com.example.pankajoil.R
-import com.example.pankajoil.bottomSheets.RegisterBottomSheet
 import com.example.pankajoil.TokenSharedPreference
+import com.example.pankajoil.bottomSheets.PasswordResetBottomSheet
+import com.example.pankajoil.bottomSheets.RegisterBottomSheet
 import com.example.pankajoil.bottomSheets.VariantsBottomSheet
 import com.example.pankajoil.data.Product
 import com.example.pankajoil.data.User
 import com.example.pankajoil.data.Variant
-import com.example.pankajoil.roomDatabase.OrderEntity
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import de.hdodenhof.circleimageview.CircleImageView
+import es.dmoral.toasty.Toasty
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import java.util.ArrayList
 import java.util.concurrent.TimeUnit
 
 
@@ -132,6 +132,24 @@ class Util {
 
         fun stopLoading(dialog: android.app.AlertDialog) {
             dialog.dismiss()
+        }
+
+        fun showToast(context: Context, msg:String, duration:Int){
+
+            val toast:Toast
+            if (duration == 0){
+                toast = Toast.makeText(context, msg, Toast.LENGTH_SHORT)
+            }else{
+                toast= Toast.makeText(context, msg, Toast.LENGTH_LONG)
+            }
+            val v =
+                toast.view.findViewById<View>(android.R.id.message) as TextView
+            v.textSize =18f
+            v.setTextColor(context.resources.getColor(R.color.colorPrimaryDark))
+
+            //  v.setBackgroundColor(context.resources.getColor(R.color.colorPrimaryDark))
+          //  toast.view.setBackgroundColor(context.resources.getColor(R.color.colorPrimaryDark))
+            toast.show()
         }
 
     }

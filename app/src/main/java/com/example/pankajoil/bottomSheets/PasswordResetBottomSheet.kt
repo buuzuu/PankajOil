@@ -64,7 +64,10 @@ class PasswordResetBottomSheet : BottomSheetDialogFragment() {
                 verify("+91" + mobileNumber.editText!!.text.toString())
                 Util.startLoading(reset_dialog)
             } else {
-                Toast.makeText(view2.context, "Password do not match", Toast.LENGTH_LONG).show()
+                Util.showToast(
+                    view2.context,
+                    "Password do not match",1
+                )
             }
 
         }
@@ -99,11 +102,11 @@ class PasswordResetBottomSheet : BottomSheetDialogFragment() {
             override fun onVerificationFailed(e: FirebaseException) {
                 if (e is FirebaseAuthInvalidCredentialsException) {
 
-                    Toast.makeText(
+
+                    Util.showToast(
                         view2.context,
-                        "Invalid PhoneNumber",
-                        Toast.LENGTH_LONG
-                    ).show()
+                        "Invalid PhoneNumber",1
+                    )
                     Util.stopLoading(reset_dialog)
                     // [END_EXCLUDE]
                 } else if (e is FirebaseTooManyRequestsException) {
@@ -134,6 +137,10 @@ class PasswordResetBottomSheet : BottomSheetDialogFragment() {
             override fun onCodeAutoRetrievalTimeOut(p0: String) {
                 super.onCodeAutoRetrievalTimeOut(p0)
                 Toast.makeText(view2.context,"Timeout: Retry",Toast.LENGTH_SHORT).show()
+                Util.showToast(
+                    view2.context,
+                    "Timeout: Retry",1
+                )
             }
         }
 
@@ -162,8 +169,11 @@ class PasswordResetBottomSheet : BottomSheetDialogFragment() {
                     val call = service.changePassword(cred)
                     call.enqueue(object : Callback<ResponseBody> {
                         override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
-                            Toast.makeText(view2.context, "Something went wrong", Toast.LENGTH_LONG)
-                                .show()
+
+                            Util.showToast(
+                                view2.context,
+                                "Something went wrong",1
+                            )
                         }
                         override fun onResponse(
                             call: Call<ResponseBody>,
@@ -171,17 +181,19 @@ class PasswordResetBottomSheet : BottomSheetDialogFragment() {
                         ) {
                             when (response.code()) {
                                 200 -> {
-                                    Toast.makeText(view2.context, "Changed Success", Toast.LENGTH_LONG)
-                                        .show()
+
+                                    Util.showToast(
+                                        view2.context,
+                                        "Changed Success",1
+                                    )
                                     Util.passwordSheet.dismiss()
 
                                 }
                                 400 -> {
-                                    Toast.makeText(
+                                    Util.showToast(
                                         view2.context,
-                                        "Number Not Registered",
-                                        Toast.LENGTH_LONG
-                                    ).show()
+                                        "Number not registered",1
+                                    )
                                     Util.stopLoading(reset_dialog)
 
                                 }

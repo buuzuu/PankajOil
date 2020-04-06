@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.os.Handler
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -14,6 +15,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import com.example.pankajoil.MainActivity
 import com.example.pankajoil.R
 import com.example.pankajoil.TokenSharedPreference
 import com.example.pankajoil.data.ProfileImage
@@ -46,7 +48,7 @@ class ProfileFragment : Fragment(), ProgressRequestBody.UploadCallbacks {
     override fun onAttach(context: Context) {
         super.onAttach(context)
         dialog = SpotsDialog.Builder().setContext(activity).setTheme(R.style.Custom)
-            .setMessage("Uploading...").setCancelable(false).build()
+            .setMessage("Wait...").setCancelable(false).build()
     }
 
 
@@ -63,6 +65,7 @@ class ProfileFragment : Fragment(), ProgressRequestBody.UploadCallbacks {
         wishlistCount = root.findViewById(R.id.wishlistCount)
         setupViews(root)
         logout.setOnClickListener {
+            Util.startLoading(dialog)
             Util.signOut(
                 Util.header_name!!,
                 Util.header_mobile!!,
@@ -71,9 +74,16 @@ class ProfileFragment : Fragment(), ProgressRequestBody.UploadCallbacks {
                 Util.orsymbol_text!!,
                 activity!!.applicationContext
             )
-            activity!!.supportFragmentManager.beginTransaction()
-                .replace(R.id.host_fragment, HomeFragment())
-                .commit()
+            Handler().postDelayed({
+//                activity!!.supportFragmentManager.beginTransaction()
+//                    .replace(R.id.host_fragment, HomeFragment())
+//                    .commit()
+                startActivity(Intent(root.context, MainActivity::class.java))
+                Util.stopLoading(dialog)
+                Toast.makeText(root.context,"Logged Out", Toast.LENGTH_SHORT).show()
+            },1000)
+
+
         }
 
         orderCount.text = Util.user!!.orders.size.toString()

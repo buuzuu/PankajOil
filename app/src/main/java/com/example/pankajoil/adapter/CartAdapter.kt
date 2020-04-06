@@ -93,7 +93,7 @@ class CartAdapter(val orderList: ArrayList<OrderEntity>, ctx: Context, var listn
                 mAlertDialog.dismiss()
             }
             mAlertDialog.apply.setOnClickListener {
-                if (mAlertDialog.value.text.isNullOrEmpty()){
+                if (mAlertDialog.value.text.isNullOrEmpty() || mDialogView.value.text.toString().toInt() == 0){
                     mAlertDialog.dismiss()
                 }else{
 

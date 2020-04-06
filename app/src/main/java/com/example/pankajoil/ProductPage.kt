@@ -81,11 +81,13 @@ class ProductPage : AppCompatActivity() {
 
             override fun onEvent(button: ImageView?, buttonState: Boolean) {
                 if (buttonState) {
+                    Util.startLoading(dialog)
                     if (TokenSharedPreference(this@ProductPage).isTokenPresent()) {
                         call.enqueue(object : Callback<ResponseBody> {
                             override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
                                 Toast.makeText(this@ProductPage, t.message, Toast.LENGTH_LONG)
                                     .show()
+                                Util.stopLoading(dialog)
                             }
 
                             override fun onResponse(
@@ -94,11 +96,13 @@ class ProductPage : AppCompatActivity() {
                             ) {
                                 when (response.code()) {
                                     200 -> {
-                                        Toast.makeText(
+
+                                        Util.showToast(
                                             this@ProductPage,
-                                            "Added",
-                                            Toast.LENGTH_SHORT
-                                        ).show()
+                                            "Added", 0
+                                        )
+
+                                        Util.stopLoading(dialog)
                                         val products: ArrayList<WishlistProducts> =
                                             Util.user!!.wishlistProducts as ArrayList<WishlistProducts>
                                         products.add(
@@ -112,8 +116,11 @@ class ProductPage : AppCompatActivity() {
 
                                     }
                                     400 -> {
-                                        Toast.makeText(this@ProductPage, "404", Toast.LENGTH_SHORT)
-                                            .show()
+                                        Util.showToast(
+                                            this@ProductPage,
+                                            "404", 0
+                                        )
+                                        Util.stopLoading(dialog)
 
                                     }
                                     else -> {
@@ -122,6 +129,7 @@ class ProductPage : AppCompatActivity() {
                                             response.code(),
                                             Toast.LENGTH_SHORT
                                         ).show()
+                                        Util.stopLoading(dialog)
 
                                     }
                                 }
@@ -148,11 +156,11 @@ class ProductPage : AppCompatActivity() {
                             ) {
                                 when (response.code()) {
                                     200 -> {
-                                        Toast.makeText(
+
+                                        Util.showToast(
                                             this@ProductPage,
-                                            "Removed",
-                                            Toast.LENGTH_SHORT
-                                        ).show()
+                                            "Removed", 0
+                                        )
                                         val products: ArrayList<WishlistProducts> =
                                             Util.user!!.wishlistProducts as ArrayList<WishlistProducts>
                                         products.forEachIndexed { index, wishlistProducts ->
@@ -165,8 +173,10 @@ class ProductPage : AppCompatActivity() {
 
                                     }
                                     400 -> {
-                                        Toast.makeText(this@ProductPage, "404", Toast.LENGTH_SHORT)
-                                            .show()
+                                        Util.showToast(
+                                            this@ProductPage,
+                                            "404", 0
+                                        )
 
                                     }
                                     else -> {
@@ -211,17 +221,24 @@ class ProductPage : AppCompatActivity() {
                 )
 
             )
-            addToCart(
-                call3, OrderEntity(
-                    product!!.uniqueID,
-                    product!!.productName,
-                    Util.current_Variant!!.size,
-                    1,
-                    Util.current_Variant!!.url,
-                    Util.current_Variant!!.price,
-                    Util.current_Variant!!.perCarton
+            if (TokenSharedPreference(this).isTokenPresent()) {
+                addToCart(
+                    call3, OrderEntity(
+                        product!!.uniqueID,
+                        product!!.productName,
+                        Util.current_Variant!!.size,
+                        1,
+                        Util.current_Variant!!.url,
+                        Util.current_Variant!!.price,
+                        Util.current_Variant!!.perCarton
+                    )
                 )
-            )
+            } else {
+                Util.showToast(
+                    this@ProductPage,
+                    "Sign in your account", 0
+                )
+            }
 
         }
 
@@ -291,25 +308,31 @@ class ProductPage : AppCompatActivity() {
 
         call3.enqueue(object : Callback<ResponseBody> {
             override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
-                Toast.makeText(this@ProductPage, "Retry", Toast.LENGTH_SHORT).show()
+                Util.showToast(
+                    this@ProductPage,
+                    "Retry", 0
+                )
                 Util.stopLoading(dialog)
             }
 
             override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
                 Util.stopLoading(dialog)
-                if (response.code() == 409){
+                if (response.code() == 409) {
                     startActivity(Intent(this@ProductPage, Cart::class.java))
-                }else if (response.code() == 200){
+                } else if (response.code() == 200) {
                     val cart: ArrayList<OrderEntity> =
                         Util.user!!.cartItems
                     cart.add(orderEntity)
                     Util.user!!.cartItems = cart
                     startActivity(Intent(this@ProductPage, Cart::class.java))
-                }else{
-                    Toast.makeText(this@ProductPage, "Something went wrong", Toast.LENGTH_SHORT).show()
+                } else {
+
+                    Util.showToast(
+                        this@ProductPage,
+                        "Something went wrong", 0
+                    )
 
                 }
-
 
 
             }

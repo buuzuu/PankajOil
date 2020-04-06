@@ -85,7 +85,8 @@ class OrderSummary : AppCompatActivity() {
         getAllCart()
         placeOrder.setOnClickListener {
             if (i == 0) {
-                Toast.makeText(this, "Please select payment medium", Toast.LENGTH_LONG).show()
+                Util.showToast(this, "Please select payment medium", 1)
+
             } else if (i == 1) {
                 startUPIPayment()
             } else if (i == 2) {
@@ -127,7 +128,8 @@ class OrderSummary : AppCompatActivity() {
             Util.startLoading(dialog)
             startActivityForResult(intentChooser, UPI_PAYMENT)
         }else{
-            Toast.makeText(this,"No UPI app found,please install one to continue",Toast.LENGTH_LONG).show()
+            Util.showToast(this, "No UPI app found,please install one to continue", 1)
+
         }
     }
 
@@ -165,6 +167,9 @@ class OrderSummary : AppCompatActivity() {
         }
         if (hashMap["Status"] == "SUCCESS"){
             Toast.makeText(this,"Payment Done",Toast.LENGTH_SHORT).show()
+            Util.showToast(this, "Payment Done", 0)
+
+
             var fOrder= Order(
                 generateOrderItem(), orderID,hashMap["ApprovalRefNo"].toString(),hashMap["txnId"].toString(),
                 SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(Date()).toString(),
@@ -173,7 +178,9 @@ class OrderSummary : AppCompatActivity() {
             )
             createOrder(fOrder)
         }else{
-            Toast.makeText(this,"Payment Failed",Toast.LENGTH_SHORT).show()
+            Util.showToast(this, "Payment Failed", 0)
+
+            Util.stopLoading(dialog)
         }
     }
     //create order
@@ -187,7 +194,8 @@ class OrderSummary : AppCompatActivity() {
         call.enqueue(object : Callback<ResponseBody> {
             override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
                 Util.stopLoading(dialog)
-                Toast.makeText(this@OrderSummary, "Order Not Saved", Toast.LENGTH_LONG).show()
+                Util.showToast(this@OrderSummary, "Order Not Saved",1)
+
             }
             override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
 

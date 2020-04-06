@@ -118,7 +118,10 @@ class Cart : AppCompatActivity(), OnCartItemClickListner {
             )
             call.enqueue(object : Callback<ResponseBody> {
                 override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
-                    Toast.makeText(this@Cart, "Failed", Toast.LENGTH_SHORT).show()
+                    Util.showToast(
+                        this@Cart,
+                        "Failed", 0
+                    )
                     Util.stopLoading(dialogg)
                 }
                 override fun onResponse(
@@ -145,7 +148,10 @@ class Cart : AppCompatActivity(), OnCartItemClickListner {
         call.enqueue(object : Callback<ResponseBody>{
             override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
                 Util.stopLoading(dialogg)
-                Toast.makeText(this@Cart, "Failed", Toast.LENGTH_SHORT).show()
+                Util.showToast(
+                    this@Cart,
+                    "Failed", 0
+                )
             }
             override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
                 if (response.code() == 200){
