@@ -1,7 +1,9 @@
 package com.example.pankajoil.data
 
 
+import com.example.pankajoil.roomDatabase.OrderEntity
 import com.google.gson.annotations.SerializedName
+import java.util.ArrayList
 
 data class User(
     @SerializedName("_id")
@@ -17,6 +19,7 @@ data class User(
     val gstin: String,
     var wishlistProducts: List<WishlistProducts>,
     var orders: List<Order>,
+    var cartItems: ArrayList<OrderEntity>,
     @SerializedName("__v")
     val v: Int
 )

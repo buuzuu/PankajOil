@@ -9,11 +9,9 @@ import android.os.Handler
 import android.util.Log
 import android.view.MenuItem
 import android.view.View
-import android.widget.Button
 import android.widget.RadioButton
 import android.widget.TextView
 import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -21,8 +19,6 @@ import com.droidbyme.dialoglib.DroidDialog
 import com.example.pankajoil.adapter.SummaryCartAdapter
 import com.example.pankajoil.data.Item
 import com.example.pankajoil.data.Order
-import com.example.pankajoil.roomDatabase.OrderDAO
-import com.example.pankajoil.roomDatabase.OrderDatabase
 import com.example.pankajoil.roomDatabase.OrderEntity
 import com.example.pankajoil.service.APIServices
 import com.example.pankajoil.utils.Util
@@ -45,9 +41,8 @@ import kotlin.math.roundToInt
 class OrderSummary : AppCompatActivity() {
     private lateinit var toolbar: Toolbar
     lateinit var stepView: StepView
-    lateinit var database: OrderDatabase
     lateinit var list: List<OrderEntity>
-    lateinit var dao: OrderDAO
+
     var prodPrice: Int? = 0
     var igstPrice: Double? = null
     var cstPrice: Double? = null
@@ -69,8 +64,7 @@ class OrderSummary : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_order_summary)
         toolbar = findViewById(R.id.toolbar)
-        database = OrderDatabase.getInstance(this)
-        dao = database.movieDao()
+
         orderID = generateOrderID()
         price = findViewById(R.id.productPrice)
         igst = findViewById(R.id.igst)
@@ -88,12 +82,7 @@ class OrderSummary : AppCompatActivity() {
         stepView.go(1, true)
         setupUserDetails()
         orderSummaryRV.layoutManager = LinearLayoutManager(this)
-        CoroutineScope(Dispatchers.IO).launch {
-            list = dao.getAllOrder()
-            Log.d("TAGG", list.size.toString())
-            computeProductPrice(list)
-            orderSummaryRV.adapter = SummaryCartAdapter(list)
-        }
+        getAllCart()
         placeOrder.setOnClickListener {
             if (i == 0) {
                 Toast.makeText(this, "Please select payment medium", Toast.LENGTH_LONG).show()
@@ -249,7 +238,7 @@ class OrderSummary : AppCompatActivity() {
         }
     }
 
-    fun onRadioButtonClicked(view: View) {
+    public fun onRadioButtonClicked(view: View) {
         if (view is RadioButton) {
             val checked = view.isChecked
             when (view.getId()) {
@@ -301,6 +290,29 @@ class OrderSummary : AppCompatActivity() {
         val n = 100000 + Random().nextInt(900000)
         return n.toString()
     }
+
+    fun getAllCart(){
+        Util.startLoading(dialog)
+        val call = service.getAllCart(
+            TokenSharedPreference(this).getMobileNumber(),
+            TokenSharedPreference(this).getAuthKey()
+        )
+        call.enqueue( object :Callback<List<OrderEntity>>{
+            override fun onFailure(call: Call<List<OrderEntity>>, t: Throwable) {
+                Util.stopLoading(dialog)
+            }
+
+            override fun onResponse(call: Call<List<OrderEntity>>, response: Response<List<OrderEntity>>) {
+                Util.stopLoading(dialog)
+                list = response.body()!!
+                computeProductPrice(list)
+                orderSummaryRV.adapter = SummaryCartAdapter(list)
+
+            }
+
+        })
+    }
+
 
     //Add Here
 

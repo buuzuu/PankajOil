@@ -13,11 +13,13 @@ import com.example.pankajoil.bottomSheets.VariantsBottomSheet
 import com.example.pankajoil.data.Product
 import com.example.pankajoil.data.User
 import com.example.pankajoil.data.Variant
+import com.example.pankajoil.roomDatabase.OrderEntity
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import de.hdodenhof.circleimageview.CircleImageView
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import java.util.ArrayList
 import java.util.concurrent.TimeUnit
 
 
@@ -38,10 +40,8 @@ class Util {
 
         //Cart
         var cartItem: TextView?=null
-        var qty: TextView?=null
         var empty_Image: ImageView?=null
         lateinit var cart_Bottom:FloatingActionButton
-
 
 
 

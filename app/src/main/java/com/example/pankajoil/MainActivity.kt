@@ -23,8 +23,6 @@ import androidx.fragment.app.Fragment
 import com.example.jetpack_kotlin.ui.home.*
 import com.example.pankajoil.data.LoginCredentials
 import com.example.pankajoil.data.User
-import com.example.pankajoil.roomDatabase.OrderDAO
-import com.example.pankajoil.roomDatabase.OrderDatabase
 import com.example.pankajoil.service.APIServices
 import com.example.pankajoil.utils.Util
 import com.google.android.material.navigation.NavigationView
@@ -39,9 +37,6 @@ import com.karumi.dexter.listener.multi.MultiplePermissionsListener
 import com.squareup.picasso.Picasso
 import de.hdodenhof.circleimageview.CircleImageView
 import dmax.dialog.SpotsDialog
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import org.json.JSONObject
 import retrofit2.Call
 import retrofit2.Callback
@@ -336,7 +331,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.action_cart -> {
-                startActivity(Intent(this, Cart::class.java))
+                if (TokenSharedPreference(this).isTokenPresent()) {
+                    startActivity(Intent(this, Cart::class.java))
+                } else {
+                    Toast.makeText(this, "Sign in your account ", Toast.LENGTH_SHORT).show()
+                }
 
                 true
             }
@@ -363,7 +362,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             }
             R.id.nav_cart -> {
                 //  fragment = CartFragment()
-                startActivity(Intent(this, Cart::class.java))
+                if (TokenSharedPreference(this).isTokenPresent()) {
+                    startActivity(Intent(this, Cart::class.java))
+                } else {
+                    Toast.makeText(this, "Sign in your account ", Toast.LENGTH_SHORT).show()
+                }
 
             }
             R.id.nav_orders -> {

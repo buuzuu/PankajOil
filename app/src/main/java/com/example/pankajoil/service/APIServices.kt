@@ -1,6 +1,7 @@
 package com.example.pankajoil.service
 
 import com.example.pankajoil.data.*
+import com.example.pankajoil.roomDatabase.OrderEntity
 import okhttp3.MultipartBody
 import okhttp3.ResponseBody
 import org.json.JSONObject
@@ -50,6 +51,20 @@ interface APIServices {
     @Multipart
     @POST("uploadProfileImage/{id}")
     fun uploadProfileImage(@Path("id") id: String, @Part file: MultipartBody.Part, @Header("x-Auth-Token") authKey: String): Call<ProfileImage>
+
+
+    @POST("users/addToCart/{id}")
+    fun addToCart(@Path("id") id: String,@Header("x-Auth-Token") authKey: String, @Body orderEntity: OrderEntity): Call<ResponseBody>
+
+    @DELETE("users/deleteCartItem/{id}/{size}/{uniqueID}")
+    fun deleteCartItem(@Path("id") id: String, @Header("x-Auth-Token") authKey: String, @Path("size") size: Float, @Path("uniqueID") uniqueID: String): Call<ResponseBody>
+
+    @GET("users/getAllCart/{id}")
+    fun getAllCart(@Path("id") id: String,@Header("x-Auth-Token") authKey: String): Call<List<OrderEntity>>
+
+
+    @PUT("users/updateCart/{id}")
+    fun updateCartItem(@Path("id") id: String,@Header("x-Auth-Token") authKey: String,@Body updateCart: UpdateCart):Call<ResponseBody>
 
 
 

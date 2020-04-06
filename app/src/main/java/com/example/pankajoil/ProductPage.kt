@@ -2,7 +2,6 @@ package com.example.pankajoil
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.ImageView
@@ -10,9 +9,9 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import com.example.pankajoil.bottomSheets.VariantsBottomSheet
-import com.example.pankajoil.data.*
-import com.example.pankajoil.roomDatabase.OrderDAO
-import com.example.pankajoil.roomDatabase.OrderDatabase
+import com.example.pankajoil.data.Product
+import com.example.pankajoil.data.User
+import com.example.pankajoil.data.WishlistProducts
 import com.example.pankajoil.roomDatabase.OrderEntity
 import com.example.pankajoil.service.APIServices
 import com.example.pankajoil.utils.Util
@@ -20,15 +19,12 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
 import com.squareup.picasso.Picasso
 import com.varunest.sparkbutton.SparkEventListener
+import dmax.dialog.SpotsDialog
 import kotlinx.android.synthetic.main.activity_product_page.*
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import java.io.Serializable
 import java.util.*
 
 class ProductPage : AppCompatActivity() {
@@ -36,15 +32,16 @@ class ProductPage : AppCompatActivity() {
     lateinit var toolbar: Toolbar
     lateinit var addToCart: FloatingActionButton
     var product: Product? = null
-    lateinit var database: OrderDatabase
-    lateinit var dao: OrderDAO
+    private lateinit var dialog: android.app.AlertDialog
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_product_page)
         toolbar = findViewById(R.id.toolbar)
         setupID()
-        database = OrderDatabase.getInstance(this)
-        dao = database.movieDao()
+        dialog = SpotsDialog.Builder().setContext(this).setTheme(R.style.Custom)
+            .setMessage("Adding...").setCancelable(false).build()
         setSupportActionBar(toolbar)
         addToCart = findViewById(R.id.addToCart)
         supportActionBar?.setDisplayShowTitleEnabled(false)
@@ -61,9 +58,7 @@ class ProductPage : AppCompatActivity() {
         Util.prod_Item_Price!!.text = "₹ ${Util.current_Variant!!.price}"
         Util.prod_About!!.text = product!!.description
 
-        if (TokenSharedPreference(this@ProductPage).isTokenPresent()) {
-            setSparkButton(Util.user!!, product!!.uniqueID)
-        }
+
         volume.setOnClickListener {
             Util.prod_BottomSheet!!.show(supportFragmentManager, "VariantBottomSheet")
         }
@@ -198,21 +193,36 @@ class ProductPage : AppCompatActivity() {
 
         })
 
+
+
         addToCart.setOnClickListener {
-            CoroutineScope(Dispatchers.IO).launch {
-                dao.addOrder(
-                    OrderEntity(
-                        product!!.uniqueID,
-                        product!!.productName,
-                        Util.current_Variant!!.size,
-                        1,
-                        Util.current_Variant!!.url,
-                        Util.current_Variant!!.price,
-                        Util.current_Variant!!.perCarton
-                    )
+
+            val call3 = service.addToCart(
+                TokenSharedPreference(this).getMobileNumber(),
+                TokenSharedPreference(this).getAuthKey(),
+                OrderEntity(
+                    product!!.uniqueID,
+                    product!!.productName,
+                    Util.current_Variant!!.size,
+                    1,
+                    Util.current_Variant!!.url,
+                    Util.current_Variant!!.price,
+                    Util.current_Variant!!.perCarton
                 )
-                startActivity(Intent(this@ProductPage, Cart::class.java))
-            }
+
+            )
+            addToCart(
+                call3, OrderEntity(
+                    product!!.uniqueID,
+                    product!!.productName,
+                    Util.current_Variant!!.size,
+                    1,
+                    Util.current_Variant!!.url,
+                    Util.current_Variant!!.price,
+                    Util.current_Variant!!.perCarton
+                )
+            )
+
         }
 
     }
@@ -226,9 +236,11 @@ class ProductPage : AppCompatActivity() {
         Util.prod_Quantity = findViewById(R.id.quantity)
     }
 
-    override fun onResume() {
-        super.onResume()
-
+    override fun onStart() {
+        super.onStart()
+        if (TokenSharedPreference(this@ProductPage).isTokenPresent()) {
+            setSparkButton(Util.user!!, product!!.uniqueID)
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -268,6 +280,42 @@ class ProductPage : AppCompatActivity() {
         if (check) {
             spark_button.isChecked = check
         }
+    }
+
+    fun addToCart(
+        call3: Call<ResponseBody>,
+        orderEntity: OrderEntity
+    ) {
+        Util.startLoading(dialog)
+
+
+        call3.enqueue(object : Callback<ResponseBody> {
+            override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
+                Toast.makeText(this@ProductPage, "Retry", Toast.LENGTH_SHORT).show()
+                Util.stopLoading(dialog)
+            }
+
+            override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
+                Util.stopLoading(dialog)
+                if (response.code() == 409){
+                    startActivity(Intent(this@ProductPage, Cart::class.java))
+                }else if (response.code() == 200){
+                    val cart: ArrayList<OrderEntity> =
+                        Util.user!!.cartItems
+                    cart.add(orderEntity)
+                    Util.user!!.cartItems = cart
+                    startActivity(Intent(this@ProductPage, Cart::class.java))
+                }else{
+                    Toast.makeText(this@ProductPage, "Something went wrong", Toast.LENGTH_SHORT).show()
+
+                }
+
+
+
+            }
+
+        })
+
     }
 
 }
