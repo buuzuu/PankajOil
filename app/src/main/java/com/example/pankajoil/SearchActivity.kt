@@ -46,20 +46,16 @@ class SearchActivity : AppCompatActivity() {
         val menuItem = menu!!.findItem(R.id.action_search)
         val searchView: SearchView = menuItem.actionView as SearchView
         searchView.imeOptions = EditorInfo.IME_ACTION_DONE
-
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
                 return false;
             }
-
             override fun onQueryTextChange(newText: String?): Boolean {
                 adapter!!.filter.filter(newText)
+
                 return false;
             }
-
-        }
-
-        )
+        })
         return true
     }
 

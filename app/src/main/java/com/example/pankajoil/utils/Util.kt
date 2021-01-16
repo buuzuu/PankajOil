@@ -65,7 +65,6 @@ class Util {
             .addConverterFactory(GsonConverterFactory.create())
             .client(okHttpClient())
             .baseUrl("https://pankaj-oil-api.herokuapp.com/")
-
             .build()!!
 
         private fun okHttpClient(): OkHttpClient {

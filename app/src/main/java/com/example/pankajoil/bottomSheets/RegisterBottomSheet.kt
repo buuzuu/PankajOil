@@ -15,6 +15,7 @@ import com.example.pankajoil.service.APIServices
 import com.example.pankajoil.utils.Util
 import com.google.android.gms.tasks.TaskExecutors
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputLayout
 import com.google.firebase.FirebaseException
 import com.google.firebase.FirebaseTooManyRequestsException
@@ -100,8 +101,6 @@ class RegisterBottomSheet : BottomSheetDialogFragment() {
 
             override fun onVerificationCompleted(credential: PhoneAuthCredential) {
                 val smsCode: String? = credential.smsCode
-                Toast.makeText(activity!!.applicationContext,smsCode, Toast.LENGTH_SHORT).show()
-
                 if (!smsCode.isNullOrEmpty()) {
                     otp.editText!!.text =
                         Editable.Factory.getInstance().newEditable(smsCode)
@@ -210,6 +209,7 @@ class RegisterBottomSheet : BottomSheetDialogFragment() {
 
                                     Util.registerSheet.dismiss()
                                     Toast.makeText(view3.context, "Account Created", Toast.LENGTH_LONG).show()
+
 
                                 }
                                 400 -> {

@@ -24,6 +24,7 @@ import com.example.jetpack_kotlin.ui.home.*
 import com.example.pankajoil.data.LoginCredentials
 import com.example.pankajoil.data.User
 import com.example.pankajoil.service.APIServices
+import com.example.pankajoil.ui.order.OrderFragment
 import com.example.pankajoil.utils.Util
 import com.google.android.material.navigation.NavigationView
 import com.google.android.material.textfield.TextInputLayout

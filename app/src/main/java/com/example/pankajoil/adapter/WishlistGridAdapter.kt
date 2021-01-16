@@ -26,7 +26,8 @@ import retrofit2.Response
 import java.io.Serializable
 import java.util.ArrayList
 
-class WishlistGridAdapter(var list: ArrayList<WishlistProducts>, var ctx:Context) : RecyclerView.Adapter<WishlistGridAdapter.WishViewHolder>() {
+class WishlistGridAdapter(var list: ArrayList<WishlistProducts>, var ctx: Context) :
+    RecyclerView.Adapter<WishlistGridAdapter.WishViewHolder>() {
 
     val service: APIServices = Util.generalRetrofit.create(APIServices::class.java)
 
@@ -35,7 +36,8 @@ class WishlistGridAdapter(var list: ArrayList<WishlistProducts>, var ctx:Context
         parent: ViewGroup,
         viewType: Int
     ): WishlistGridAdapter.WishViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.wishlist_grid_item_layout, null)
+        val view =
+            LayoutInflater.from(parent.context).inflate(R.layout.wishlist_grid_item_layout, null)
         return WishViewHolder(view)
     }
 
@@ -48,19 +50,20 @@ class WishlistGridAdapter(var list: ArrayList<WishlistProducts>, var ctx:Context
         holder.textView.text = list[position].productName
         Picasso.get().load(list[position].generalUrl).into(holder.imageView)
         holder.spark.isChecked = true
-        holder.spark.setEventListener(object :SparkEventListener{
+        holder.spark.setEventListener(object : SparkEventListener {
             override fun onEventAnimationEnd(button: ImageView?, buttonState: Boolean) {
             }
 
             override fun onEvent(button: ImageView?, buttonState: Boolean) {
-                if (!buttonState){
+                if (!buttonState) {
                     val call2 = service.deleteFromWishList(
                         TokenSharedPreference(ctx).getMobileNumber(),
                         TokenSharedPreference(ctx).getAuthKey(),
                         list[position].uniqueID
                     )
-                    removeFromWishlist(call2,list[position].uniqueID)
+                    removeFromWishlist(call2, list[position].uniqueID)
                     notifyItemChanged(position)
+                    notifyDataSetChanged()
                     list.removeAt(position)
 
                 }
@@ -75,9 +78,10 @@ class WishlistGridAdapter(var list: ArrayList<WishlistProducts>, var ctx:Context
 
     inner class WishViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView),
         View.OnClickListener {
-        var imageView:ImageView = itemView.findViewById(R.id.item_image)
-        var textView:TextView = itemView.findViewById(R.id.item_text)
-        var spark:SparkButton = itemView.findViewById(R.id.spark_button)
+        var imageView: ImageView = itemView.findViewById(R.id.item_image)
+        var textView: TextView = itemView.findViewById(R.id.item_text)
+        var spark: SparkButton = itemView.findViewById(R.id.spark_button)
+
         init {
             itemView.setOnClickListener(this)
         }
@@ -89,7 +93,8 @@ class WishlistGridAdapter(var list: ArrayList<WishlistProducts>, var ctx:Context
             ctx.startActivity(intent)
 
         }
-        fun findProduct(s: String):Product?{
+
+        fun findProduct(s: String): Product? {
             val products: ArrayList<Product> = Util.products as ArrayList<Product>
             products.forEachIndexed { index, product ->
                 if (product.uniqueID == s) {
@@ -101,7 +106,7 @@ class WishlistGridAdapter(var list: ArrayList<WishlistProducts>, var ctx:Context
 
     }
 
-    fun removeFromWishlist(call2: Call<ResponseBody>, s:String) {
+    fun removeFromWishlist(call2: Call<ResponseBody>, s: String) {
         call2.enqueue(object : Callback<ResponseBody> {
             override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
                 Toast.makeText(ctx, t.message, Toast.LENGTH_LONG)
@@ -127,7 +132,6 @@ class WishlistGridAdapter(var list: ArrayList<WishlistProducts>, var ctx:Context
                             }
                         }
                         Util.user!!.wishlistProducts = products
-
                     }
                     400 -> {
                         Toast.makeText(ctx, "404", Toast.LENGTH_SHORT)

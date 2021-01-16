@@ -1,8 +1,7 @@
-package com.example.jetpack_kotlin.ui.home
+package com.example.pankajoil.ui.order
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,9 +13,6 @@ import com.example.pankajoil.MainActivity
 import com.example.pankajoil.R
 import com.example.pankajoil.adapter.OrdersAdapter
 import com.example.pankajoil.utils.Util
-import kotlinx.android.synthetic.main.fragment_order.view.*
-import java.text.SimpleDateFormat
-import java.util.*
 
 class OrderFragment : Fragment() {
 
@@ -37,6 +33,8 @@ class OrderFragment : Fragment() {
             imageView.visibility = View.VISIBLE
         } else {
             recyclerView.layoutManager = LinearLayoutManager(activity!!.applicationContext)
+            (recyclerView.layoutManager as LinearLayoutManager).reverseLayout =true
+            (recyclerView.layoutManager as LinearLayoutManager).stackFromEnd = true
             recyclerView.adapter = OrdersAdapter(Util.user!!.orders)
             adapter?.notifyDataSetChanged()
         }

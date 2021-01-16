@@ -90,6 +90,8 @@ public class StaggeredAdapter extends RecyclerView.Adapter<StaggeredAdapter.Stag
             notifyDataSetChanged();
         }
     };
+
+
     class StaggerViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         ImageView image;
         TextView name;

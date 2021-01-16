@@ -22,12 +22,11 @@ import com.example.pankajoil.data.Order
 import com.example.pankajoil.roomDatabase.OrderEntity
 import com.example.pankajoil.service.APIServices
 import com.example.pankajoil.utils.Util
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
 import com.shuhart.stepview.StepView
 import dmax.dialog.SpotsDialog
 import kotlinx.android.synthetic.main.activity_order_summary.*
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.Callback
@@ -42,7 +41,6 @@ class OrderSummary : AppCompatActivity() {
     private lateinit var toolbar: Toolbar
     lateinit var stepView: StepView
     lateinit var list: List<OrderEntity>
-
     var prodPrice: Int? = 0
     var igstPrice: Double? = null
     var cstPrice: Double? = null
@@ -53,6 +51,7 @@ class OrderSummary : AppCompatActivity() {
     lateinit var cst: TextView
     lateinit var final: TextView
     var i = 0
+    val db = Firebase.firestore
     var UPI_PAYMENT = 0
     val GOOGLE_PAY_REQUEST_CODE = 123
 
@@ -64,7 +63,6 @@ class OrderSummary : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_order_summary)
         toolbar = findViewById(R.id.toolbar)
-
         orderID = generateOrderID()
         price = findViewById(R.id.productPrice)
         igst = findViewById(R.id.igst)
@@ -185,7 +183,6 @@ class OrderSummary : AppCompatActivity() {
     }
     //create order
     fun createOrder(order: Order) {
-
         val call = service.addOrder(
             order,
             TokenSharedPreference(this).getMobileNumber(),
@@ -295,8 +292,8 @@ class OrderSummary : AppCompatActivity() {
         }
     }
     fun generateOrderID(): String {
-        val n = 100000 + Random().nextInt(900000)
-        return n.toString()
+        val tsLong = System.currentTimeMillis() / 1000
+        return tsLong.toString()
     }
 
     fun getAllCart(){

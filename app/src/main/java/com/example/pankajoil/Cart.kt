@@ -2,6 +2,7 @@ package com.example.pankajoil
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
@@ -85,7 +86,6 @@ class Cart : AppCompatActivity(), OnCartItemClickListner {
             runOnUiThread {
                 Util.empty_Image!!.visibility = View.VISIBLE
                 Util.cart_Bottom!!.visibility = View.INVISIBLE
-
                 Util.cartItem!!.text = "My Cart(${size})"
 
             }
@@ -94,7 +94,6 @@ class Cart : AppCompatActivity(), OnCartItemClickListner {
                 Util.empty_Image!!.visibility = View.INVISIBLE
                 Util.cart_Bottom!!.visibility = View.VISIBLE
                 Util.cartItem!!.text = "My Cart(${size})"
-
             }
         }
     }
@@ -107,32 +106,6 @@ class Cart : AppCompatActivity(), OnCartItemClickListner {
 
     }
 
-    override fun onDelete(position: Int, size: Float, uniqueID: String) {
-
-            Util.startLoading(dialogg)
-            val call = service.deleteCartItem(
-                TokenSharedPreference(this).getMobileNumber(),
-                TokenSharedPreference(this).getAuthKey(),
-                size,
-                uniqueID
-            )
-            call.enqueue(object : Callback<ResponseBody> {
-                override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
-                    Util.showToast(
-                        this@Cart,
-                        "Failed", 0
-                    )
-                    Util.stopLoading(dialogg)
-                }
-                override fun onResponse(
-                    call: Call<ResponseBody>,
-                    response: Response<ResponseBody>
-                ) {
-                    remove(cartAdapter.orderList[position],position)
-                    removeFromLocalUsers(size, uniqueID)
-                }
-            })
-    }
 
     override fun onUpdate(position: Int, order: OrderEntity, updatedQuantity:Int,updatedAmount:Int) {
         var updatedOrder = order
@@ -191,6 +164,37 @@ class Cart : AppCompatActivity(), OnCartItemClickListner {
         }
         Util.stopLoading(dialogg)
     }
+    override fun onDelete(position: Int, size: Float, uniqueID: String) {
+
+        Util.startLoading(dialogg)
+        val call = service.deleteCartItem(
+            TokenSharedPreference(this).getMobileNumber(),
+            TokenSharedPreference(this).getAuthKey(),
+            size,
+            uniqueID
+        )
+        Log.d("TAG",TokenSharedPreference(this).getMobileNumber())
+        Log.d("TAG",TokenSharedPreference(this).getAuthKey())
+        Log.d("TAG", size.toString())
+        Log.d("TAG",uniqueID)
+        call.enqueue(object : Callback<ResponseBody> {
+            override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
+                Util.showToast(
+                    this@Cart,
+                    "Failed", 0
+                )
+                Util.stopLoading(dialogg)
+            }
+            override fun onResponse(
+                call: Call<ResponseBody>,
+                response: Response<ResponseBody>
+            ) {
+                remove(cartAdapter.orderList[position],position)
+                removeFromLocalUsers(size, uniqueID)
+            }
+        })
+    }
+
 
 
 }

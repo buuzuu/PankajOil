@@ -79,6 +79,8 @@ public class VariantRecyclerAdapter extends RecyclerView.Adapter<VariantRecycler
                 }
 
             });
+
+
         }
 
     }
